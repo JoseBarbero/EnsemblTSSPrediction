@@ -10,10 +10,10 @@ This script gets a dataframe (created by InstancesToDataframe.py) and adds 2 new
 '''
 
 
-#DATAFRAME_CSV = '../EveryEnsemblTranscript_dataframe.csv'
+#DATAFRAME_CSV = 'EveryEnsemblTranscript_dataframe.csv'
 #FLANK_LENGTH = 0
-DATAFRAME_CSV = '../EveryEnsemblTranscript_withflanks_dataframe.csv'
-DATAFRAME_OUT_FILE = '../EveryEnsemblTranscript_withTIS_dataframe.csv'
+DATAFRAME_CSV = 'EveryEnsemblTranscript_withflanks_dataframe.csv'
+DATAFRAME_OUT_FILE = 'EveryEnsemblTranscript_withTIS_dataframe.csv'
 
 # The sequence from Ensemble comes with 500 bases before and after the transcript
 FLANK_LENGTH = 500
