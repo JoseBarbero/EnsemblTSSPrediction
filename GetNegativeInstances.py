@@ -47,7 +47,6 @@ for idx, row in ensembl_df.iterrows():
         else:
             break
 
-
     j = 0
     for neg_idx in neg_idxs:
         idx_with_margin = neg_idx + row['transcriptFlankLength']    # To get the actual coordinate in the flanked transcript

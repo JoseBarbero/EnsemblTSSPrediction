@@ -26,7 +26,7 @@ ensembl_df['TIScodon'] = ''
 ensembl_df['TISFlankLength'] = TIS_FLANK_LENGTH
 
 print('RAW len', len(ensembl_df))
-ensembl_df = ensembl_df[ensembl_df['Genomic coding start'].notna()]
+ensembl_df = ensembl_df[ensembl_df['Genomic coding start'].notna()] # Aquí se pierden como la mitad de las instancias ¿Por qué faltan tantas?
 print('CLEAN len', len(ensembl_df))
 
 i = 0
