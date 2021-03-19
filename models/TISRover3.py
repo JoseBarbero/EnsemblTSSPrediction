@@ -10,13 +10,15 @@ from contextlib import redirect_stdout
 import keras
 import tensorflow as tf
 from keras import layers
+from keras.models import Sequential
+from keras.layers import Conv1D, Dropout, MaxPooling1D, Flatten, Dense
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras_self_attention import SeqSelfAttention
 
 def tisrover():
     model = Sequential()
 
-    model.add(Conv1D(filters=50, kernel_size=3, activation='relu', input_shape=(200, 8)))
+    model.add(Conv1D(filters=50, kernel_size=3, activation='relu', input_shape=(203, 4)))
     model.add(Dropout(0.2))
 
     model.add(Conv1D(filters=62, kernel_size=3, activation='relu'))
@@ -85,7 +87,7 @@ if __name__ == "__main__":
     hist_file = "logs/"+run_id+".pkl"
     plot_file = "logs/"+run_id+".png"
 
-    model = lstm_att()
+    model = tisrover()
     model.build(X_train.shape)
     model.summary()
     

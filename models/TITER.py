@@ -10,6 +10,8 @@ from contextlib import redirect_stdout
 import keras
 import tensorflow as tf
 from keras import layers
+from keras.models import Sequential
+from keras.layers import Conv1D, Dropout, MaxPooling1D, Flatten, LSTM, Dense
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras_self_attention import SeqSelfAttention
 
@@ -69,7 +71,7 @@ if __name__ == "__main__":
     hist_file = "logs/"+run_id+".pkl"
     plot_file = "logs/"+run_id+".png"
 
-    model = lstm_att()
+    model = titer()
     model.build(X_train.shape)
     model.summary()
     
