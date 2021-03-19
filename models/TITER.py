@@ -13,24 +13,21 @@ from keras import layers
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras_self_attention import SeqSelfAttention
 
+def titer():
+    model = Sequential()
 
-def lstm_att():
-    sequence_input = tf.keras.layers.Input(shape=(203,4))
-
-    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64, return_sequences=True, dropout=0.3, input_shape=(200,4)))(sequence_input)
-    x = tf.keras.layers.Attention()([x, x])
-    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64, return_sequences=True, dropout=0.3))(x)
-    x = tf.keras.layers.Dropout(0.5)(x)
-    #x = tf.keras.layers.Dense(64)(x)
-    #x = tf.keras.layers.Activation('relu')(x)
-    x = tf.keras.layers.Flatten()(x)
-    output = tf.keras.layers.Dense(1)(x)
-    output = tf.keras.layers.Activation('sigmoid')(output)
-
-    model = tf.keras.Model(inputs=sequence_input, outputs=output)
+    model.add(Conv1D(filters=128, kernel_size=3, activation='relu', input_shape=(203, 4)))
+    model.add(MaxPooling1D(3))
+    model.add(Dropout(0.25))
+    model.add(LSTM(256, return_sequences=True, go_backwards=False))
+    model.add(Dropout(0.8))
+    model.add(Flatten())
+    model.add(Dense(1, activation = 'sigmoid'))
+    
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
 
     return model
+
 
 if __name__ == "__main__":
     seed = 42
@@ -57,21 +54,10 @@ if __name__ == "__main__":
     X_test_file.close()
     y_test_file.close()
 
-#    X_train = X_train[:,:,:4]
-#    X_val = X_val[:,:,:4]
-#    X_test = X_test[:,:,:4]
-
-    print(X_train.shape, y_train.shape)
-    print(X_val.shape, y_val.shape)
-    print(X_test.shape, y_test.shape)
-
     y_train = y_train.reshape(*y_train.shape, 1)
     y_val = y_val.reshape(*y_val.shape, 1)
     y_test = y_test.reshape(*y_test.shape, 1)
 
-    print(X_train.shape, y_train.shape)
-    print(X_val.shape, y_val.shape)
-    print(X_test.shape, y_test.shape)
 
     if len(sys.argv) < 2:
         run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
