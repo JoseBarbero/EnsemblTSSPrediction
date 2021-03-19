@@ -1,2 +1,2 @@
-# EnsemblTISDatasetCreator
-Scripts to generate TIS datasets (positive and negative) from Ensembl.
+# EnsemblTISPrediction
+TIS Prediction with Ensembl data.
