@@ -10,7 +10,7 @@ This simple script gets transcripts from a fasta file and creates a structured d
 FASTA_FILE = 'EveryEnsemblTranscript_withflanks.fasta'
 DATAFRAME_OUT_FILE = 'EveryEnsemblTranscript_withflanks_dataframe.csv'
 
-# These fields come from the fasta file header (based on the fields selected from Biomart)
+# These fields come from the fasta file header *IN THIS SPECIFIC ORDER* (based on the fields selected from Biomart)
 ensembl_df = pd.DataFrame(columns=['Gene stable ID version', 'Transcript stable ID version', 'Gene start (bp)', 'Chromosome_scaffold name', 
                                    'Gene name', 'Transcript start (bp)', 'Transcription start site (TSS)', 'CDS Length', 'CDS start', 'CDS end',
                                    'Transcript end (bp)', 'Start phase', 'End phase', 'cDNA coding start', 'cDNA coding end', 'Genomic coding start', 

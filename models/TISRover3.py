@@ -11,30 +11,31 @@ import keras
 import tensorflow as tf
 from keras import layers
 from keras.models import Sequential
-from keras.layers import Conv1D, Dropout, MaxPooling1D, Flatten, Dense
+from keras.layers import Conv1D, Conv2D, Conv3D, Dropout, MaxPooling2D, Flatten, Dense
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras_self_attention import SeqSelfAttention
+from keras.callbacks import LearningRateScheduler
 
 def tisrover():
     model = Sequential()
 
-    model.add(Conv1D(filters=50, kernel_size=3, activation='relu', input_shape=(203, 4)))
+    model.add(Conv2D(filters=50, kernel_size=(9, 4), data_format='channels_last', activation='relu', input_shape=(203, 4, 1)))
     model.add(Dropout(0.2))
 
-    model.add(Conv1D(filters=62, kernel_size=3, activation='relu'))
-    model.add(MaxPooling1D(2))
+    model.add(Conv2D(filters=62, kernel_size=(7, 1), data_format="channels_last", activation='relu'))
+    model.add(MaxPooling2D((2,1)))
     model.add(Dropout(0.2))
 
-    model.add(Conv1D(filters=75, kernel_size=3, activation='relu'))
-    model.add(MaxPooling1D(2))
+    model.add(Conv2D(filters=75, kernel_size=(7, 1), strides=1, activation='relu'))
+    model.add(MaxPooling2D((2,1)))
     model.add(Dropout(0.2))
 
-    model.add(Conv1D(filters=87, kernel_size=3, activation='relu'))
-    model.add(MaxPooling1D(2))
+    model.add(Conv2D(filters=87, kernel_size=(7, 1), strides=1, activation='relu'))
+    model.add(MaxPooling2D((2,1)))
     model.add(Dropout(0.2))
 
-    model.add(Conv1D(filters=100, kernel_size=3, activation='relu'))
-    model.add(MaxPooling1D(2))
+    model.add(Conv2D(filters=100, kernel_size=(7, 1), strides=1, activation='relu'))
+    model.add(MaxPooling2D((2,1)))
     model.add(Dropout(0.2))
 
     model.add(Flatten())
@@ -42,7 +43,8 @@ def tisrover():
     model.add(Dropout(0.5))
     model.add(Dense(1, activation = 'sigmoid'))
     
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
+                                                                      
+    model.compile(optimizer=keras.optimizers.SGD(learning_rate=0.05, nesterov=0.9), loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
 
     return model
 
@@ -72,6 +74,10 @@ if __name__ == "__main__":
     X_test_file.close()
     y_test_file.close()
 
+    X_train = X_train.reshape(*X_train.shape, 1)
+    X_val = X_val.reshape(*X_val.shape, 1)
+    X_test = X_test.reshape(*X_test.shape, 1)
+
     y_train = y_train.reshape(*y_train.shape, 1)
     y_val = y_val.reshape(*y_val.shape, 1)
     y_test = y_test.reshape(*y_test.shape, 1)
@@ -94,25 +100,33 @@ if __name__ == "__main__":
     logdir = os.path.dirname(log_file)
     if not os.path.exists(logdir):
         os.mkdir(logdir)
-        
+    
+    
+
     with open(log_file, 'w') as f:
         with redirect_stdout(f):
             model.summary()
 
             for layer in model.layers:
                 print(layer.get_config())
-            early_stopping_monitor = EarlyStopping( monitor='val_loss', min_delta=0, patience=10, 
-                                                    verbose=1, mode='min', baseline=None,
-                                                    restore_best_weights=True)
-            reduce_lr_loss = ReduceLROnPlateau(monitor='val_auc', factor=0.5, patience=3, verbose=1, min_delta=1e-4, mode='max')
+            
+            def scheduler(epoch, lr):
+                print(f'Epoch: {epoch}, LR: {lr}')
+                if (epoch + 1) % 10 == 0:
+                    return lr * 0.75
+                else:
+                    return lr 
+            
+            callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
 
             history = model.fit(X_train, y_train,
                                 shuffle=True,
-                                batch_size=32,
-                                epochs=100,
+                                batch_size=1024,
+                                epochs=130,
                                 verbose=True,
                                 validation_data=(X_val, y_val),
-                                callbacks=[early_stopping_monitor, reduce_lr_loss])
+                                callbacks=[callback])
+
             print("Train results:\n")
             test_results(X_train, y_train, model)
             print("Val results:\n")

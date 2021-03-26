@@ -17,12 +17,12 @@ from keras_self_attention import SeqSelfAttention
 def lstm_att():
     sequence_input = tf.keras.layers.Input(shape=(203,4))
 
-    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64, return_sequences=True, dropout=0.3, input_shape=(200,4)))(sequence_input)
-    x = tf.keras.layers.Attention()([x, x])
-    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64, return_sequences=True, dropout=0.3))(x)
-    x = tf.keras.layers.Dropout(0.5)(x)
-    #x = tf.keras.layers.Dense(64)(x)
-    #x = tf.keras.layers.Activation('relu')(x)
+    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64, return_sequences=True, dropout=0.3, input_shape=(203,4)))(sequence_input)
+    #x = tf.keras.layers.Attention()([x, x])
+    # x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64, return_sequences=True, dropout=0.3))(x)
+    #x = tf.keras.layers.Dropout(0.5)(x)
+    x = tf.keras.layers.Dense(64)(x)
+    x = tf.keras.layers.Activation('relu')(x)
     x = tf.keras.layers.Flatten()(x)
     output = tf.keras.layers.Dense(1)(x)
     output = tf.keras.layers.Activation('sigmoid')(output)

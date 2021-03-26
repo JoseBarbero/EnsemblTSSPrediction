@@ -4,9 +4,11 @@ import numpy as np
 
 
 '''
-This script gets a dataframe (created by InstancesToDataframe.py) and adds 2 new fields:
+This script gets a dataframe (created by InstancesToDataframe.py) and adds 4 new fields:
     - flankedTIS: TIS codon flanked by TIS_FLANK_LENGTH bases
     - TIScodon: the 3 bases that start the translation
+    - transcriptFlankLength
+    - TISFlankLength
 '''
 
 
