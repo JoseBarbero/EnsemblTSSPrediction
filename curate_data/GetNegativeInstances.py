@@ -54,7 +54,6 @@ for idx, row in ensembl_df.iterrows():
 
     j = 0
     for neg_idx in neg_idxs:
-        tis_flank_length = row['transcriptFlankLength']
         idx_with_margin = neg_idx + tis_flank_length    # To get the actual coordinate in the flanked transcript
         flanked_fake_tis = transcript[idx_with_margin-tis_flank_length:idx_with_margin+tis_flank_length+3]
         
