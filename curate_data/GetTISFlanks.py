@@ -14,8 +14,8 @@ This script gets a dataframe (created by InstancesToDataframe.py) and adds 4 new
 
 #DATAFRAME_CSV = 'EveryEnsemblTranscript_dataframe.csv'
 #FLANK_LENGTH = 0
-DATAFRAME_CSV = 'EveryEnsemblTranscript_withflanks_dataframe.csv'
-DATAFRAME_OUT_FILE = 'EveryEnsemblTranscript_withTIS_dataframe.csv'
+DATAFRAME_CSV = '../rawdata/EveryEnsemblTranscript_withflanks_dataframe.csv'
+DATAFRAME_OUT_FILE = '../rawdata/EveryEnsemblTranscript_withTIS_dataframe.csv'
 
 # The sequence from Ensemble comes with 500 bases before and after the transcript
 FLANK_LENGTH = 500
@@ -25,6 +25,7 @@ ensembl_df = pd.read_csv(DATAFRAME_CSV)
 ensembl_df['transcriptFlankLength'] = FLANK_LENGTH
 ensembl_df['flankedTIS'] = ''
 ensembl_df['TIScodon'] = ''
+ensembl_df['TIScodonIndexUnflankedTranscript'] = None
 ensembl_df['TISFlankLength'] = TIS_FLANK_LENGTH
 
 print('RAW len', len(ensembl_df))
@@ -49,6 +50,7 @@ for idx, transcript in ensembl_df.iterrows():
         flankedTIS = seq[cds_start-TIS_FLANK_LENGTH:cds_start+TIS_FLANK_LENGTH+3]
         ensembl_df.at[idx, 'flankedTIS'] = flankedTIS
         ensembl_df.at[idx, 'TIScodon'] = seq[cds_start:cds_start+3]
+        ensembl_df.at[idx, 'TIScodonIndexUnflankedTranscript'] = cds_start - FLANK_LENGTH
 
     elif transcript['Strand'] == -1:
         cds_stop = abs(int(cdna_relative_stops[-1])) + FLANK_LENGTH
@@ -56,6 +58,7 @@ for idx, transcript in ensembl_df.iterrows():
         flankedTIS = seq[cds_stop-TIS_FLANK_LENGTH:cds_stop+TIS_FLANK_LENGTH+3]
         ensembl_df.at[idx, 'flankedTIS'] = flankedTIS
         ensembl_df.at[idx, 'TIScodon'] = seq[cds_stop:cds_stop+3]
+        ensembl_df.at[idx, 'TIScodonIndexUnflankedTranscript'] = cds_stop - FLANK_LENGTH
     
     i += 1
     print(f'{i}/{len(ensembl_df)}', end='\r', flush=True)

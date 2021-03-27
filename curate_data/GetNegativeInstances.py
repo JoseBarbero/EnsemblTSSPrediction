@@ -12,9 +12,9 @@ We keep those 10 negative instances in a new column of the dataframe as a list. 
 '''
 
 
-POS_INSTANCES_DF = 'EveryEnsemblTranscript_withTIS_dataframe.csv'
+POS_INSTANCES_DF = '../rawdata/EveryEnsemblTranscript_withTIS_dataframe.csv'
 POS_TO_NEG_RATIO = 10   # We generate 10 negative instances for every positive one
-DATAFRAME_OUT_FILE = 'EveryEnsemblTranscript_pos_and_neg.csv'
+DATAFRAME_OUT_FILE = '../rawdata/EveryEnsemblTranscript_pos_and_neg.csv'
 
 
 ensembl_df = pd.read_csv(POS_INSTANCES_DF)
@@ -36,6 +36,11 @@ for idx, row in ensembl_df.iterrows():
     # Get every occurence of tis_codon in that transcript
     occurrences_idxs = [ocurr.start() for ocurr in re.finditer('(?='+tis_codon+')', clean_transcript)]
 
+    # Remove the actual TIS to avoid getting it as a negative instance
+    tis_idx = row['TIScodonIndexUnflankedTranscript']
+    if tis_idx in occurrences_idxs:
+        occurrences_idxs.remove(tis_idx) 
+
     # Get a random selection of POS_TO_NEG_RATIO occurrences
     # Get 1 less every time there are no enough occurrences    
     local_pos_to_neg = POS_TO_NEG_RATIO
@@ -49,8 +54,22 @@ for idx, row in ensembl_df.iterrows():
 
     j = 0
     for neg_idx in neg_idxs:
-        idx_with_margin = neg_idx + row['transcriptFlankLength']    # To get the actual coordinate in the flanked transcript
-        ensembl_df.at[idx, f'negative_instance_{j}'] = transcript[idx_with_margin-100:idx_with_margin+103]
+        tis_flank_length = row['transcriptFlankLength']
+        idx_with_margin = neg_idx + tis_flank_length    # To get the actual coordinate in the flanked transcript
+        flanked_fake_tis = transcript[idx_with_margin-tis_flank_length:idx_with_margin+tis_flank_length+3]
+        
+        # Maybe that random codon is a real TIS in another row
+        # I tried this and never happened in 1000000 cases
+        # It makes the processing much slower so I'll skip it
+        # if flanked_fake_tis in ensembl_df['flankedTIS'].values:
+        #     
+        #     print('\n\n\nFALSE NEGATIVE!!\n\n\n')
+        #     print(flanked_fake_tis)
+        #     print(row['flankedTIS'])
+        #     input()
+        
+        ensembl_df.at[idx, f'negative_instance_{j}'] = flanked_fake_tis
+        
         j+=1
     
     i +=1
