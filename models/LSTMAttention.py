@@ -36,12 +36,12 @@ if __name__ == "__main__":
     seed = 42
     np.random.seed(seed)
 
-    X_train_file = open('../data/onehot_serialized/X_train.pkl', 'rb')
-    y_train_file = open('../data/onehot_serialized/y_train.pkl', 'rb')
-    X_val_file = open('../data/onehot_serialized/X_val.pkl', 'rb')
-    y_val_file = open('../data/onehot_serialized/y_val.pkl', 'rb')
-    X_test_file = open('../data/onehot_serialized/X_test.pkl', 'rb')
-    y_test_file = open('../data/onehot_serialized/y_test.pkl', 'rb')
+    X_train_file = open('../data/onehot_serialized/X_train_TIS.pkl', 'rb')
+    y_train_file = open('../data/onehot_serialized/y_train_TIS.pkl', 'rb')
+    X_val_file = open('../data/onehot_serialized/X_val_TIS.pkl', 'rb')
+    y_val_file = open('../data/onehot_serialized/y_val_TIS.pkl', 'rb')
+    X_test_file = open('../data/onehot_serialized/X_test_TIS.pkl', 'rb')
+    y_test_file = open('../data/onehot_serialized/y_test_TIS.pkl', 'rb')
 
     X_train = pickle.load(X_train_file)
     y_train = pickle.load(y_train_file)
