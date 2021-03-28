@@ -15,7 +15,7 @@ This script gets a dataframe (created by InstancesToDataframe.py) and adds 4 new
 #DATAFRAME_CSV = 'EveryEnsemblTranscript_dataframe.csv'
 #FLANK_LENGTH = 0
 DATAFRAME_CSV = '../rawdata/EveryEnsemblTranscript_withflanks_dataframe.csv'
-DATAFRAME_OUT_FILE = '../rawdata/EveryEnsemblTranscript_withTIS_dataframe.csv'
+DATAFRAME_OUT_FILE = '../rawdata/TIS/EveryEnsemblTranscript_withTIS_dataframe.csv'
 
 # The sequence from Ensemble comes with 500 bases before and after the transcript
 FLANK_LENGTH = 500

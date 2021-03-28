@@ -9,22 +9,22 @@ VAL_CHROMOSOMES = {'16'}
 TEST_CHROMOSOMES = {'1', '2', '19', '21'}
 
 # X pos seqs
-X_TRAIN_SEQS_POS_FILE = '../data/seqs/X_train_TISseqs_pos.txt'
-X_VAL_SEQS_POS_FILE = '../data/seqs/X_val_TISseqs_pos.txt'
-X_TEST_SEQS_POS_FILE = '../data/seqs/X_test_TISseqs_pos.txt'
+X_TRAIN_SEQS_POS_FILE = '../data/TIS/seqs/X_train_TISseqs_pos.txt'
+X_VAL_SEQS_POS_FILE = '../data/TIS/seqs/X_val_TISseqs_pos.txt'
+X_TEST_SEQS_POS_FILE = '../data/TIS/seqs/X_test_TISseqs_pos.txt'
 # X neg seqs
-X_TRAIN_SEQS_NEG_FILE = '../data/seqs/X_train_TISseqs_neg.txt'
-X_VAL_SEQS_NEG_FILE = '../data/seqs/X_val_TISseqs_neg.txt'
-X_TEST_SEQS_NEG_FILE = '../data/seqs/X_test_TISseqs_neg.txt'
+X_TRAIN_SEQS_NEG_FILE = '../data/TIS/seqs/X_train_TISseqs_neg.txt'
+X_VAL_SEQS_NEG_FILE = '../data/TIS/seqs/X_val_TISseqs_neg.txt'
+X_TEST_SEQS_NEG_FILE = '../data/TIS/seqs/X_test_TISseqs_neg.txt'
 
 # Processed X (as onehot) and y
-X_TRAIN_FILE = '../data/onehot_serialized/X_train_TIS.pkl'
-X_VAL_FILE = '../data/onehot_serialized/X_val_TIS.pkl'
-X_TEST_FILE = '../data/onehot_serialized/X_test_TIS.pkl'
+X_TRAIN_FILE = '../data/TIS/onehot_serialized/X_train_TIS.pkl'
+X_VAL_FILE = '../data/TIS/onehot_serialized/X_val_TIS.pkl'
+X_TEST_FILE = '../data/TIS/onehot_serialized/X_test_TIS.pkl'
 
-Y_TRAIN_FILE = '../data/onehot_serialized/y_train_TIS.pkl'
-Y_VAL_FILE = '../data/onehot_serialized/y_val_TIS.pkl'
-Y_TEST_FILE = '../data/onehot_serialized/y_test_TIS.pkl'
+Y_TRAIN_FILE = '../data/TIS/onehot_serialized/y_train_TIS.pkl'
+Y_VAL_FILE = '../data/TIS/onehot_serialized/y_val_TIS.pkl'
+Y_TEST_FILE = '../data/TIS/onehot_serialized/y_test_TIS.pkl'
 
 
 
