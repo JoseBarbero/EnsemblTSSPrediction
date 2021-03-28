@@ -2,29 +2,29 @@ import pandas as pd
 import numpy as np
 import pickle
 
-DATAFRAME_CSV = '../rawdata/EveryEnsemblTranscript_pos_and_neg.csv'
+DATAFRAME_CSV = '../rawdata/EveryEnsemblTranscript_pos_and_neg_TSS.csv'
 
 TRAIN_CHROMOSOMES = {'3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '17', '18', '20', 'X', 'Y'}
 VAL_CHROMOSOMES = {'16'}
 TEST_CHROMOSOMES = {'1', '2', '19', '21'}
 
 # X pos seqs
-X_TRAIN_SEQS_POS_FILE = '../data/seqs/X_train_seqs_pos.txt'
-X_VAL_SEQS_POS_FILE = '../data/seqs/X_val_seqs_pos.txt'
-X_TEST_SEQS_POS_FILE = '../data/seqs/X_test_seqs_pos.txt'
+X_TRAIN_SEQS_POS_FILE = '../data/seqs/X_train_TSSseqs_pos.txt'
+X_VAL_SEQS_POS_FILE = '../data/seqs/X_val_TSSseqs_pos.txt'
+X_TEST_SEQS_POS_FILE = '../data/seqs/X_test_TSSseqs_pos.txt'
 # X neg seqs
-X_TRAIN_SEQS_NEG_FILE = '../data/seqs/X_train_seqs_neg.txt'
-X_VAL_SEQS_NEG_FILE = '../data/seqs/X_val_seqs_neg.txt'
-X_TEST_SEQS_NEG_FILE = '../data/seqs/X_test_seqs_neg.txt'
+X_TRAIN_SEQS_NEG_FILE = '../data/seqs/X_train_TSSseqs_neg.txt'
+X_VAL_SEQS_NEG_FILE = '../data/seqs/X_val_TSSseqs_neg.txt'
+X_TEST_SEQS_NEG_FILE = '../data/seqs/X_test_TSSseqs_neg.txt'
 
 # Processed X (as onehot) and y
-X_TRAIN_FILE = '../data/onehot_serialized/X_train.pkl'
-X_VAL_FILE = '../data/onehot_serialized/X_val.pkl'
-X_TEST_FILE = '../data/onehot_serialized/X_test.pkl'
+X_TRAIN_FILE = '../data/onehot_serialized/X_train_TSS.pkl'
+X_VAL_FILE = '../data/onehot_serialized/X_val_TSS.pkl'
+X_TEST_FILE = '../data/onehot_serialized/X_test_TSS.pkl'
 
-Y_TRAIN_FILE = '../data/onehot_serialized/y_train.pkl'
-Y_VAL_FILE = '../data/onehot_serialized/y_val.pkl'
-Y_TEST_FILE = '../data/onehot_serialized/y_test.pkl'
+Y_TRAIN_FILE = '../data/onehot_serialized/y_train_TSS.pkl'
+Y_VAL_FILE = '../data/onehot_serialized/y_val_TSS.pkl'
+Y_TEST_FILE = '../data/onehot_serialized/y_test_TSS.pkl'
 
 
 
