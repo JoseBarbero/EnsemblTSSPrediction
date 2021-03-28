@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pickle
 
-DATAFRAME_CSV = '../rawdata/EveryEnsemblTranscript_pos_and_neg_TSS.csv'
+DATAFRAME_CSV = '../rawdata/TSS/EveryEnsemblTranscript_pos_and_neg_TSS.csv'
 
 TRAIN_CHROMOSOMES = {'3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '17', '18', '20', 'X', 'Y'}
 VAL_CHROMOSOMES = {'16'}
