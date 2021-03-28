@@ -46,7 +46,7 @@ def split_dataframe(df):
 
 # Sacar las secuencias de cada línea del DF
 def get_pos_seqs(df):
-    pos_seqs = df['flankedTIS'].to_numpy(dtype=str)
+    pos_seqs = df['flankedTSS'].to_numpy(dtype=str)
     return pos_seqs
 
 def get_neg_seqs(df, n_neg):
