@@ -1,7 +1,7 @@
 import sys
 sys.path.append("../utils")
 from ReadData import seqfile_to_instances
-from WDKernel import wdkernel
+from WDKernel import wdkernel, get_K_value
 import time
 
 from strkernel.mismatch_kernel import MismatchKernel
@@ -20,12 +20,12 @@ from numpy import random
 import pickle 
 
 
-X_train_seqs_pos = seqfile_to_instances('../data/seqs/X_train_seqs_pos.txt')
-X_train_seqs_neg = seqfile_to_instances('../data/seqs/X_train_seqs_neg.txt')
-#X_val_seqs_pos = seqfile_to_instances('../data/seqs/X_val_seqs_pos.txt')
-#X_val_seqs_neg = seqfile_to_instances('../data/seqs/X_val_seqs_neg.txt')
-X_test_seqs_pos = seqfile_to_instances('../data/seqs/X_test_seqs_pos.txt')
-X_test_seqs_neg = seqfile_to_instances('../data/seqs/X_test_seqs_neg.txt')
+X_train_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_pos.txt')[:1000]
+X_train_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_neg.txt')[:1000]
+#X_val_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_val_TISseqs_pos.txt')
+#X_val_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_val_TISseqs_neg.txt')
+X_test_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_pos.txt')[:1000]
+X_test_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_neg.txt')[:1000]
 
 
 # train
@@ -59,7 +59,6 @@ Y_test_seqs_pos = np.ones(len(X_test_seqs_pos), dtype=int)
 Y_test_seqs_neg = np.zeros(len(X_test_seqs_neg), dtype=int)
 X_test = np.concatenate([X_test_seqs_pos_Kernels,X_test_seqs_neg_Kernels])
 y_test = np.concatenate([Y_test_seqs_pos,Y_test_seqs_neg])
-
 
 clf = SVC()
 clf.fit(X_train, y_train)
