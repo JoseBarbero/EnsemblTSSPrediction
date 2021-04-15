@@ -5,7 +5,7 @@ def beta_k(d, k):
     return 2*((d-k+1)/d*(d+1))
 
 
-def wdkernel(x, y):
+def wdkernel(x, d):
     '''
     x = sequences matrix (N, L)
     L = sequences length
@@ -20,7 +20,7 @@ def wdkernel(x, y):
     E1 = First summatory in the formula
     E2 = Second summatory in the formula
     '''
-    d = 3       # HARDCODED
+
     N = x.shape[0]
     L = len(x[0])
 
