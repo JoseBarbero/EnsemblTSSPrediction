@@ -7,8 +7,8 @@ This simple script gets transcripts from a fasta file and creates a structured d
 
 
 # This file has every transcript from hg38.p13 downloaded using Biomart from https://www.ensembl.org/
-FASTA_FILE = 'EveryEnsemblTranscript_withflanks.fasta'
-DATAFRAME_OUT_FILE = 'EveryEnsemblTranscript_withflanks_dataframe.csv'
+FASTA_FILE = '../rawdata/EveryEnsemblTranscript_withflanks.fasta'
+DATAFRAME_OUT_FILE = '../rawdata/EveryEnsemblTranscript_withflanks_dataframe.csv'
 
 # These fields come from the fasta file header *IN THIS SPECIFIC ORDER* (based on the fields selected from Biomart)
 ensembl_df = pd.DataFrame(columns=['Gene stable ID version', 'Transcript stable ID version', 'Gene start (bp)', 'Chromosome_scaffold name', 
