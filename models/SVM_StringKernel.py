@@ -42,6 +42,10 @@ print('Neg train vectorized', time.process_time() - start)
 # label positive data as 1, negative as 0
 Y_train_seqs_pos = np.ones(len(X_train_seqs_pos), dtype=int)
 Y_train_seqs_neg = np.zeros(len(X_train_seqs_neg), dtype=int)
+
+print('Y_train_seqs_pos shape', Y_train_seqs_pos.shape)
+print('Y_train_seqs_neg shape', Y_train_seqs_neg.shape)
+
 X_train = np.concatenate([X_train_seqs_pos_Kernels, X_train_seqs_neg_Kernels])
 y_train = np.concatenate([Y_train_seqs_pos, Y_train_seqs_neg])
 
