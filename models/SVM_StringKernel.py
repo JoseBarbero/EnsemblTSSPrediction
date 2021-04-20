@@ -29,41 +29,29 @@ X_test_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_pos.txt'
 X_test_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_neg.txt')
 
 
+
+
 # train
-start = time.process_time()
-X_train_seqs_pos_Kernels = wdkernel(X_train_seqs_pos, d=3)
-print('Pos train vectorized', time.process_time() - start)
+X_train = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
+y_train = np.concatenate([np.ones(len(X_train_seqs_pos), dtype=int), np.zeros(len(X_train_seqs_neg), dtype=int)])
 
-start = time.process_time()
-X_train_seqs_neg_Kernels = wdkernel(X_train_seqs_neg, d=3)
-print('Neg train vectorized', time.process_time() - start)
+X_train = wdkernel(X_train, d=3)
 
-# merge data
-# label positive data as 1, negative as 0
-Y_train_seqs_pos = np.ones(len(X_train_seqs_pos), dtype=int)
-Y_train_seqs_neg = np.zeros(len(X_train_seqs_neg), dtype=int)
+print('X_train shape:', X_train.shape)
 
-print('X_train_seqs_pos_Kernels shape', X_train_seqs_pos_Kernels.shape)
-print('X_train_seqs_neg_Kernels shape', X_train_seqs_neg_Kernels.shape)
-
-X_train = np.concatenate([X_train_seqs_pos_Kernels, X_train_seqs_neg_Kernels])
-y_train = np.concatenate([Y_train_seqs_pos, Y_train_seqs_neg])
 
 # test
-start = time.process_time()
-X_test_seqs_pos_Kernels = wdkernel(X_test_seqs_pos, d=3)
-print('Pos test vectorized', time.process_time() - start)
 
-start = time.process_time()
-X_test_seqs_neg_Kernels = wdkernel(X_test_seqs_neg, d=3)
-print('Neg test vectorized', time.process_time() - start)
+X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
+y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
 
-# merge data
-# label positive data as 1, negative as 0
-Y_test_seqs_pos = np.ones(len(X_test_seqs_pos), dtype=int)
-Y_test_seqs_neg = np.zeros(len(X_test_seqs_neg), dtype=int)
-X_test = np.concatenate([X_test_seqs_pos_Kernels,X_test_seqs_neg_Kernels])
-y_test = np.concatenate([Y_test_seqs_pos,Y_test_seqs_neg])
+X_test = wdkernel(X_test, d=3)
+
+print('X_test shape:', X_test.shape)
+
+
+
+
 
 clf = SVC()
 clf.fit(X_train, y_train)
