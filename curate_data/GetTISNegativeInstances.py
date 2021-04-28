@@ -26,7 +26,9 @@ for i in range(POS_TO_NEG_RATIO):
 i=0
 
 for idx, row in ensembl_df.iterrows():
-    tis_flank_length = row['TISFlankLength']
+    tis_flank_length_upstream = row['TISFlankLengthUpstream']
+    tis_flank_length_downstream = row['TISFlankLengthDownstream']
+    
     tis_codon = row['TIScodon']
 
     transcript_flank_length = row['transcriptFlankLength']
@@ -54,6 +56,14 @@ for idx, row in ensembl_df.iterrows():
 
     j = 0
     for neg_idx in neg_idxs:
+
+        # TODO I'm not 100% sure about this
+        if transcript['Strand'] == 1:
+            tis_flank_length = tis_flank_length_upstream
+        elif transcript['Strand'] == -1:
+            tis_flank_length = tis_flank_length_downstream
+
+
         idx_with_margin = neg_idx + tis_flank_length    # To get the actual coordinate in the flanked transcript
         flanked_fake_tis = transcript[idx_with_margin-tis_flank_length:idx_with_margin+tis_flank_length+3]
         

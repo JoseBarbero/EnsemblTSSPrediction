@@ -26,7 +26,8 @@ for i in range(POS_TO_NEG_RATIO):
 i=0
 
 for idx, row in ensembl_df.iterrows():
-    tss_flank_length = row['TSSFlankLength']
+    tss_flank_length_upstream = row['TSSFlankLengthUpstream']
+    tss_flank_length_downstream = row['TSSFlankLengthDownstream']
     tss_codon = row['TSScodon']
 
     transcript_flank_length = row['transcriptFlankLength']
@@ -54,6 +55,13 @@ for idx, row in ensembl_df.iterrows():
 
     j = 0
     for neg_idx in neg_idxs:
+
+        # TODO I'm not 100% sure about this
+        if transcript['Strand'] == 1:
+            tss_flank_length = tss_flank_length_upstream
+        elif transcript['Strand'] == -1:
+            tss_flank_length = tss_flank_length_downstream
+
         idx_with_margin = neg_idx + tss_flank_length    # To get the actual coordinate in the flanked transcript
         flanked_fake_tss = transcript[idx_with_margin-tss_flank_length:idx_with_margin+tss_flank_length+3]
         
