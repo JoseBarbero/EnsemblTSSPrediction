@@ -18,7 +18,7 @@ from keras.callbacks import LearningRateScheduler
 
 def cnn_lstm():
 
-    model.add(Conv1D(filters=128, kernel_size=3, activation='relu', input_shape=(203, 4)))
+    model.add(Conv1D(filters=128, kernel_size=3, activation='relu', input_shape=(1003, 4)))
     model.add(MaxPooling1D(3))
     model.add(Dropout(0.25))
     model.add(LSTM(256, return_sequences=True, go_backwards=False))
