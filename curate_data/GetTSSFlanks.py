@@ -42,30 +42,20 @@ i = 0
 for idx, transcript in ensembl_df.iterrows():
 
     seq = transcript['Sequence']
-    #print('\n\n'+transcript['Transcript stable ID version'], 'Strand', transcript['Strand'])
-    
-    cdna_starts = [int(a) for a in transcript['Genomic coding start'].split(';')]
-    cdna_stops = [int(a) for a in transcript['Genomic coding end'].split(';')]
-
-    cdna_relative_starts = sorted([int(a) - int(transcript['Transcription start site (TSS)']) for a in cdna_starts])
-    cdna_relative_stops = sorted([int(a) - int(transcript['Transcription start site (TSS)']) for a in cdna_stops])
-
     if transcript['Strand'] == 1:
-        cds_start = int(cdna_relative_starts[0]) + UPSTREAM_FLANK_LENGTH
-        print(str(cds_start) + ' ' + str(transcript['Strand']), seq[cds_start:cds_start+3] == 'ATG', seq[cds_start:cds_start+3])
-        flankedTSS = seq[cds_start-UPSTREAM_TSS_FLANK_LENGTH:cds_start+DOWNSTREAM_TSS_FLANK_LENGTH+3]
-        ensembl_df.at[idx, 'flankedTSS'] = flankedTSS
-        ensembl_df.at[idx, 'TSScodon'] = seq[cds_start:cds_start+3]
-        ensembl_df.at[idx, 'TSScodonIndexUnflankedTranscript'] = cds_start - UPSTREAM_FLANK_LENGTH
 
-    elif transcript['Strand'] == -1:
-        cds_stop = abs(int(cdna_relative_stops[-1])) + DOWNSTREAM_FLANK_LENGTH
-        print(str(cds_stop) + ' ' + str(transcript['Strand']), seq[cds_stop:cds_stop+3] == 'ATG', seq[cds_stop:cds_stop+3])
-        flankedTSS = seq[cds_stop-DOWNSTREAM_TSS_FLANK_LENGTH:cds_stop+UPSTREAM_TSS_FLANK_LENGTH+3]
+        tss_idx = 0 + UPSTREAM_FLANK_LENGTH
+        flankedTSS = seq[tss_idx-UPSTREAM_TSS_FLANK_LENGTH:tss_idx+DOWNSTREAM_TSS_FLANK_LENGTH+3]
         ensembl_df.at[idx, 'flankedTSS'] = flankedTSS
-        ensembl_df.at[idx, 'TSScodon'] = seq[cds_stop:cds_stop+3]
-        ensembl_df.at[idx, 'TSScodonIndexUnflankedTranscript'] = cds_stop - DOWNSTREAM_FLANK_LENGTH
-    
+        ensembl_df.at[idx, 'TSScodon'] = seq[tss_idx:tss_idx+3]
+
+    elif transcript['Strand'] == 1:
+
+        tss_idx = 0 + DOWNSTREAM_FLANK_LENGTH
+        flankedTSS = seq[tss_idx-DOWNSTREAM_TSS_FLANK_LENGTH:tss_idx+UPSTREAM_TSS_FLANK_LENGTH+3]
+        ensembl_df.at[idx, 'flankedTSS'] = flankedTSS
+        ensembl_df.at[idx, 'TSScodon'] = seq[tss_idx:tss_idx+3]
+
     i += 1
     print(f'{i}/{len(ensembl_df)}', end='\r', flush=True)
 
