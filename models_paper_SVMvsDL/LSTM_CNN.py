@@ -64,7 +64,7 @@ if __name__ == "__main__":
     hist_file = "logs/"+run_id+".pkl"
     plot_file = "logs/"+run_id+".png"
 
-    model = cnn()
+    model = cnn_lstm()
     model.build(X_train.shape)
     model.summary()
     
