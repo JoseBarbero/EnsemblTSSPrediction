@@ -49,7 +49,7 @@ for idx, transcript in ensembl_df.iterrows():
         ensembl_df.at[idx, 'flankedTSS'] = flankedTSS
         ensembl_df.at[idx, 'TSScodon'] = seq[tss_idx:tss_idx+3]
 
-    elif transcript['Strand'] == 1:
+    elif transcript['Strand'] == -1:
 
         tss_idx = 0 + DOWNSTREAM_FLANK_LENGTH
         flankedTSS = seq[tss_idx-DOWNSTREAM_TSS_FLANK_LENGTH:tss_idx+UPSTREAM_TSS_FLANK_LENGTH+3]
