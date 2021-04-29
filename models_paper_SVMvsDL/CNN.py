@@ -35,6 +35,8 @@ def cnn():
     model.add(Dense(128, activation = 'relu'))
     model.add(Dropout(0.2))
 
+    model.add(Flatten())
+
     model.add(Dense(1, activation = 'sigmoid'))
                                                                       
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
