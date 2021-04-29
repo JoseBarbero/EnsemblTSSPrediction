@@ -25,8 +25,8 @@ DOWNSTREAM_TIS_FLANK_LENGTH = 300
 
 
 ensembl_df = pd.read_csv(DATAFRAME_CSV)
-ensembl_df['transcriptFlankLength_Upstream'] = UPSTREAM_FLANK_LENGTH
-ensembl_df['transcriptFlankLength_Downstream'] = DOWNSTREAM_FLANK_LENGTH
+ensembl_df['transcriptFlankLengthUpstream'] = UPSTREAM_FLANK_LENGTH
+ensembl_df['transcriptFlankLengthDownstream'] = DOWNSTREAM_FLANK_LENGTH
 ensembl_df['flankedTIS'] = ''
 ensembl_df['TIScodon'] = ''
 ensembl_df['TIScodonIndexUnflankedTranscript'] = None

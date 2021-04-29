@@ -31,9 +31,17 @@ for idx, row in ensembl_df.iterrows():
     
     tis_codon = row['TIScodon']
 
-    transcript_flank_length = row['transcriptFlankLength']
+    transcript_flank_length_upstream = row['transcriptFlankLengthUpstream']
+    transcript_flank_length_downstream = row['transcriptFlankLengthDownstream']
+    
     transcript = row['Sequence']
-    clean_transcript = transcript[transcript_flank_length:-transcript_flank_length]
+
+    if row['Strand'] == 1:
+        clean_transcript = transcript[transcript_flank_length_upstream:-transcript_flank_length_downstream]
+    elif row['Strand'] == -1:
+        clean_transcript = transcript[transcript_flank_length_downstream:-transcript_flank_length_upstream]
+
+    
 
     # Get every occurence of tis_codon in that transcript
     occurrences_idxs = [ocurr.start() for ocurr in re.finditer('(?='+tis_codon+')', clean_transcript)]
@@ -57,15 +65,14 @@ for idx, row in ensembl_df.iterrows():
     j = 0
     for neg_idx in neg_idxs:
 
-        # TODO I'm not 100% sure about this
-        if transcript['Strand'] == 1:
-            tis_flank_length = tis_flank_length_upstream
-        elif transcript['Strand'] == -1:
-            tis_flank_length = tis_flank_length_downstream
+        if row['Strand'] == 1:
+            idx_with_margin = neg_idx + tis_flank_length_upstream    # To get the actual coordinate in the flanked transcript
+            flanked_fake_tis = transcript[idx_with_margin-tis_flank_length_upstream:idx_with_margin+tis_flank_length_downstream+3]
+        elif row['Strand'] == -1:
+            idx_with_margin = neg_idx + tis_flank_length_downstream    # To get the actual coordinate in the flanked transcript
+            flanked_fake_tis = transcript[idx_with_margin-tis_flank_length_downstream:idx_with_margin+tis_flank_length_upstream+3]
 
-
-        idx_with_margin = neg_idx + tis_flank_length    # To get the actual coordinate in the flanked transcript
-        flanked_fake_tis = transcript[idx_with_margin-tis_flank_length:idx_with_margin+tis_flank_length+3]
+        
         
         # Maybe that random codon is a real TIS in another row
         # I tried this and never happened in 1000000 cases
