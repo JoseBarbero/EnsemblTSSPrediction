@@ -17,7 +17,8 @@ from keras_self_attention import SeqSelfAttention
 from keras.callbacks import LearningRateScheduler
 
 def cnn_lstm():
-
+    model = Sequential()
+    
     model.add(Conv1D(filters=128, kernel_size=3, activation='relu', input_shape=(1003, 4)))
     model.add(MaxPooling1D(3))
     model.add(Dropout(0.25))
