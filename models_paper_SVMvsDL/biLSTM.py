@@ -17,7 +17,7 @@ from keras_self_attention import SeqSelfAttention
 from keras.callbacks import LearningRateScheduler
 
 def bilstm():
-    sequence_input = tf.keras.layers.Input(shape=(203,4))
+    sequence_input = tf.keras.layers.Input(shape=(1003,4))
 
     x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=128, return_sequences=True, input_shape=(1003,4)))(sequence_input)
     x = tf.keras.layers.Dense(64)(x)
