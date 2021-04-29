@@ -18,7 +18,7 @@ from keras.callbacks import LearningRateScheduler
 
 def cnn_lstm():
     model = Sequential()
-    
+
     model.add(Conv1D(filters=128, kernel_size=3, activation='relu', input_shape=(1003, 4)))
     model.add(MaxPooling1D(3))
     model.add(Dropout(0.25))
@@ -26,6 +26,8 @@ def cnn_lstm():
     model.add(Dropout(0.8))
     model.add(Flatten())
     model.add(Dense(1, activation = 'sigmoid'))
+
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
 
     return model
 
