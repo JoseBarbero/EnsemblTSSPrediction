@@ -19,14 +19,14 @@ from numpy import random
 
 import pickle 
 
-X_train_seqs_pos = seqfile_to_instances('../data/data/TIS/seqs/X_train_TISseqs_pos.txt')[::10]
+X_train_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_pos.txt')#[::10]
 print('xtrp', len(X_train_seqs_pos))
-X_train_seqs_neg = seqfile_to_instances('../data/data/TIS/seqs/X_train_TISseqs_neg.txt')[::100]
+X_train_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_neg.txt')[::10]
 print('xtrn', len(X_train_seqs_neg))
 #X_val_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_val_TISseqs_pos.txt')
 #X_val_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_val_TISseqs_neg.txt')
-X_test_seqs_pos = seqfile_to_instances('../data/data/TIS/seqs/X_test_TISseqs_pos.txt')[::10]
-X_test_seqs_neg = seqfile_to_instances('../data/data/TIS/seqs/X_test_TISseqs_neg.txt')[::100]
+X_test_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_pos.txt')#[::10]
+X_test_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_neg.txt')[::10]
 
 
 
