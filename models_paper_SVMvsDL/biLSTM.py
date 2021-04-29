@@ -23,6 +23,7 @@ def bilstm():
     x = tf.keras.layers.Dense(64)(x)
     x = tf.keras.layers.Dropout(0.5)(x)
     x = tf.keras.layers.Activation('relu')(x)
+    x = tf.keras.layers.Flatten()(x)
     output = tf.keras.layers.Dense(1)(x)
     output = tf.keras.layers.Activation('sigmoid')(output)
 
