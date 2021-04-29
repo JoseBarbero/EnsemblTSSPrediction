@@ -28,6 +28,7 @@ i=0
 for idx, row in ensembl_df.iterrows():
     tss_flank_length_upstream = row['TSSFlankLengthUpstream']
     tss_flank_length_downstream = row['TSSFlankLengthDownstream']
+
     tss_codon = row['TSScodon']
 
     transcript_flank_length_upstream = row['transcriptFlankLengthUpstream']
@@ -40,6 +41,7 @@ for idx, row in ensembl_df.iterrows():
     elif row['Strand'] == -1:
         clean_transcript = transcript[transcript_flank_length_downstream:-transcript_flank_length_upstream]
 
+    print(clean_transcript)
     # Get every occurence of tss_codon in that transcript
     occurrences_idxs = [ocurr.start() for ocurr in re.finditer('(?='+tss_codon+')', clean_transcript)]
 
