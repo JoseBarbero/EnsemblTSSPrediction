@@ -52,7 +52,7 @@ for idx, transcript in ensembl_df.iterrows():
 
     if transcript['Strand'] == 1:
         cds_start = int(cdna_relative_starts[0]) + UPSTREAM_FLANK_LENGTH
-        print(str(cds_start) + ' ' + str(transcript['Strand']), seq[cds_start:cds_start+3] == 'ATG', seq[cds_start:cds_start+3])
+        #print(str(cds_start) + ' ' + str(transcript['Strand']), seq[cds_start:cds_start+3] == 'ATG', seq[cds_start:cds_start+3])
         flankedTIS = seq[cds_start-UPSTREAM_TIS_FLANK_LENGTH:cds_start+DOWNSTREAM_TIS_FLANK_LENGTH+3]
         ensembl_df.at[idx, 'flankedTIS'] = flankedTIS
         ensembl_df.at[idx, 'TIScodon'] = seq[cds_start:cds_start+3]
@@ -60,7 +60,7 @@ for idx, transcript in ensembl_df.iterrows():
 
     elif transcript['Strand'] == -1:
         cds_stop = abs(int(cdna_relative_stops[-1])) + DOWNSTREAM_FLANK_LENGTH
-        print(str(cds_stop) + ' ' + str(transcript['Strand']), seq[cds_stop:cds_stop+3] == 'ATG', seq[cds_stop:cds_stop+3])
+        #print(str(cds_stop) + ' ' + str(transcript['Strand']), seq[cds_stop:cds_stop+3] == 'ATG', seq[cds_stop:cds_stop+3])
         flankedTIS = seq[cds_stop-DOWNSTREAM_TIS_FLANK_LENGTH:cds_stop+UPSTREAM_TIS_FLANK_LENGTH+3]
         ensembl_df.at[idx, 'flankedTIS'] = flankedTIS
         ensembl_df.at[idx, 'TIScodon'] = seq[cds_stop:cds_stop+3]
