@@ -41,7 +41,6 @@ for idx, row in ensembl_df.iterrows():
     elif row['Strand'] == -1:
         clean_transcript = transcript[transcript_flank_length_downstream:-transcript_flank_length_upstream]
 
-    print(clean_transcript)
     # Get every occurence of tss_codon in that transcript
     occurrences_idxs = [ocurr.start() for ocurr in re.finditer('(?='+tss_codon+')', clean_transcript)]
 
