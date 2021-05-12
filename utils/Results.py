@@ -31,7 +31,7 @@ def plot_train_history(history, imgname):
     
     fig.savefig(imgname)
     plt.close()
-    
+
 
 def test_results(X_test, y_test, model):
     test_bc, test_acc, test_auc = model.evaluate(X_test, y_test, verbose=False)
