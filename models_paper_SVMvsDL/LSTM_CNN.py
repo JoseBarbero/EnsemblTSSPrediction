@@ -22,7 +22,7 @@ def cnn_lstm():
     model.add(Conv1D(filters=128, kernel_size=3, activation='relu', input_shape=(1003, 4)))
     model.add(MaxPooling1D(3))
     model.add(Dropout(0.25))
-    model.add(LSTM(256, return_sequences=True, go_backwards=False))
+    model.add(LSTM(128, return_sequences=True, go_backwards=False))
     model.add(Dropout(0.8))
     model.add(Flatten())
     model.add(Dense(1, activation = 'sigmoid'))
