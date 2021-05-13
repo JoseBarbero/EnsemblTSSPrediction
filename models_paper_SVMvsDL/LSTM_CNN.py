@@ -223,4 +223,4 @@ if __name__ == "__main__":
     else:
         run_id = sys.argv[1]
     
-    single_train(cnn_lstm(), X_train, X_val, X_test, y_train, y_test, run_id)
+    single_train(cnn_lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
