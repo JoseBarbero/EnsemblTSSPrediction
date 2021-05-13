@@ -32,7 +32,7 @@ def cnn_lstm():
 
     return model
 
-def k_train(model_definition, n_folds, X_train, X_val, X_test, Y_train, Y_test, runid):
+def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
 
     
     accuracy_train = np.zeros(5)
@@ -146,7 +146,7 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, Y_train, Y_test, 
         np.savetxt(summary_f, auc_test.mean())
 
 
-def single_train(model_definition, X_train, X_val, X_test, Y_train, Y_test, runid):
+def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
 
     log_file = "logs/"+run_id+".log"
     hist_file = "logs/"+run_id+".pkl"
