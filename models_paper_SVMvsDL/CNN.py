@@ -62,9 +62,9 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
 
     for k in range(n_folds):
 
-        log_file = "logs/"+run_id+k+".log"
-        hist_file = "logs/"+run_id+k+".pkl"
-        plot_file = "logs/"+run_id+k+".png"
+        log_file = "logs/"+run_id+str(k)+".log"
+        hist_file = "logs/"+run_id+str(k)+".pkl"
+        plot_file = "logs/"+run_id+str(k)+".png"
 
         logdir = os.path.dirname(log_file)
         if not os.path.exists(logdir):
