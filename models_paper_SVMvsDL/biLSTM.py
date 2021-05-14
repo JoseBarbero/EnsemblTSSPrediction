@@ -235,7 +235,7 @@ def single_train(model_definition, X_train, X_val, X_test, Y_train, Y_test, runi
     with open(hist_file, 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
 
-    plot_train_history(history.history, plot_file)
+#    plot_train_history(history.history, plot_file)
 
 
 if __name__ == "__main__":

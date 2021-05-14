@@ -113,7 +113,7 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         with open(hist_file, 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
 
-        plot_train_history(history.history, plot_file)
+#        plot_train_history(history.history, plot_file)
 
     with open(summary_file, 'wb') as summary_f:
         summary_f.write('accuracy_train: ')
