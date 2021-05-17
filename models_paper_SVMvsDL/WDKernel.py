@@ -39,8 +39,8 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     print('X2', X2.shape)
     d_g = d
     L = len(X1[0])
-    n_cols = X1.shape[0]
-    n_rows = X2.shape[0]
+    n_rows = X1.shape[0]
+    n_cols = X2.shape[0]
 
     # Divide the matrix by rows
     cores = 10
