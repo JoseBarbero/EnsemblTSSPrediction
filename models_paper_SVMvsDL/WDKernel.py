@@ -33,6 +33,8 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     global block_size
     global shared_array
     X_g = X1
+    print('X1', X1.shape)
+    print('X2', X2.shape)
     d_g = d
     L = len(X1[0])
     block_size = 100
