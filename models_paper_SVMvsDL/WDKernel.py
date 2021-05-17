@@ -43,7 +43,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     n_cols = X2.shape[0]
 
     # Divide the matrix by rows
-    cores = 10
+    cores = 12
     block_size = int(n_rows/cores)
     rows = [(startrow, startrow+block_size) if startrow+block_size <= n_rows  else (startrow, n_rows) for startrow in range(0, n_rows, block_size)]
 
@@ -88,7 +88,7 @@ def wdkernel_gram_matrix(X1, X2):
     for i in range(N1):
         for j in range(N2):
             print(f'{N2*i+j:,}/{N1*N2:,}', end='\r', flush=True)
-            get_K_value(X1[i], X2[j], L, d)
+            K[i, j] = get_K_value(X1[i], X2[j], L, d)
 
     return K
 
