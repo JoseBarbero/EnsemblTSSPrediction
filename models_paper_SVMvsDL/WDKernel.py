@@ -14,7 +14,7 @@ def fill_per_window(args):
 
         for idx_x in range(window_x, window_x + block_size):
             for idx_y in range(window_y, window_y + block_size):
-                tmp[idx_x, idx_y] = get_K_value(X_g[idx_x], X_g[idx_y], L, d)
+                tmp[idx_x, idx_y] = get_K_value(X_g[idx_x], X_g[idx_y], L, d_g)
 
 
 def parallel_wdkernel_gram_matrix(X1, X2):
