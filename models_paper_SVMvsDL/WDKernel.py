@@ -14,6 +14,7 @@ def fill_per_window(args):
 
         for idx_x in range(inirow, endrow):
             for idx_y in range(L):
+                print(L)
                 tmp[idx_x, idx_y] = get_K_value(X_g[idx_x], X_g[idx_y], L, d_g)
 
 
