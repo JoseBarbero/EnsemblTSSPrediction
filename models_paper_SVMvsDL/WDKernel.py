@@ -13,8 +13,7 @@ def fill_per_window(args):
         tmp = np.ctypeslib.as_array(shared_array)
 
         for idx_x in range(inirow, endrow):
-            for idx_y in range(L):
-                print(L)
+            for idx_y in range(size):
                 tmp[idx_x, idx_y] = get_K_value(X_g[idx_x], X_g[idx_y], L, d_g)
 
 
@@ -22,7 +21,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     # https://jonasteuwen.github.io/numpy/python/multiprocessing/2017/01/07/multiprocessing-numpy-array.html
     
 
-    size = X1.shape[0]
+    
     d = 3
 
     # Needed for multiprocessing
@@ -31,11 +30,13 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     global L
     global block_size
     global shared_array
+    global size
     X_g = X1
     print('X1', X1.shape)
     print('X2', X2.shape)
     d_g = d
     L = len(X1[0])
+    size = X1.shape[0]
 
     # Divide the matrix by rows
     cores = 10
