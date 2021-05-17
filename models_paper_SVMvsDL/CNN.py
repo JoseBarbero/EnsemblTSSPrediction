@@ -159,7 +159,7 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
     log_file = "logs/"+run_id+".log"
     hist_file = "logs/"+run_id+".pkl"
-    plot_file = "logs/"+run_id+".png"  
+    plot_file = "logs/"+run_id+".png"
 
     logdir = os.path.dirname(log_file)
     if not os.path.exists(logdir):
