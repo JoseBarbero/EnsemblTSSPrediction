@@ -27,7 +27,8 @@ def wdkernel_gram_matrix(X1, X2):
 
     N1 = X1.shape[0]
     N2 = X2.shape[0]
-    
+    print('X1', X1.shape)
+    print('X2', X2.shape)
     L = len(X1[0])
     d = 3
 
@@ -42,6 +43,8 @@ def wdkernel_gram_matrix(X1, X2):
 
 
 def get_K_value(xi, xj, L, d):
+    print('xi', xi.shape)
+    print('xj', xj.shape)
     # Formula from https://www.jmlr.org/papers/volume7/sonnenburg06a/sonnenburg06a.pdf
     # First SUM
     E1 = 0
@@ -51,6 +54,9 @@ def get_K_value(xi, xj, L, d):
         E2 = 0
         for l in range(L-k+1):  #Aquí no sumo 1 a cada lado del range porque son posiciones de una lista
             E2 += int(xi[l:l+k] == xj[l:l+k])
-            print(xi[l:l+k], xj[l:l+k], xi[l:l+k] == xj[l:l+k], int(xi[l:l+k] == xj[l:l+k]))
+            print('xi[l:l+k]', xi[l:l+k].shape)
+            print('xj[l:l+k]', xj[l:l+k].shape)
+            input()
+            #print(xi[l:l+k], xj[l:l+k], xi[l:l+k] == xj[l:l+k], int(xi[l:l+k] == xj[l:l+k]))
         E1 += beta * E2
     return E1
