@@ -34,7 +34,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
                                                         range(0, size, block_size))]
 
     p = Pool()
-    res = p.map(fill_per_window, [*window_idxs, X1, X2, shared_array, L, d, block_size])
+    res = p.map(fill_per_window, [window_idxs, X1, X2, shared_array, L, d, block_size])
     result = np.ctypeslib.as_array(shared_array)
 
     return result
