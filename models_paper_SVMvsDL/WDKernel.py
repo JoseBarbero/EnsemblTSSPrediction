@@ -5,6 +5,40 @@ def beta_k(d, k):
     # Formula from https://www.jmlr.org/papers/volume7/sonnenburg06a/sonnenburg06a.pdf
     return 2*((d-k+1)/(d*(d+1)))
 
+def parallel_wdkernel_gram_matrix(X1, X2):
+    # https://jonasteuwen.github.io/numpy/python/multiprocessing/2017/01/07/multiprocessing-numpy-array.html
+    import numpy as np
+    import itertools
+    from multiprocessing import Pool #  Process pool
+    from multiprocessing import sharedctypes
+
+    size = X1.shape[0]
+    block_size = 100
+    L = len(X1[0])
+    d = 3
+
+    K = np.ctypeslib.as_ctypes(np.zeros((size, size)))
+    shared_array = sharedctypes.RawArray(K._type_, K)
+
+
+    def fill_per_window(args):
+        window_x, window_y = args
+        tmp = np.ctypeslib.as_array(shared_array)
+
+        for idx_x in range(window_x, window_x + block_size):
+            for idx_y in range(window_y, window_y + block_size):
+                tmp[idx_x, idx_y] = X1[idx_x, idx_y]
+                tmp[idx_x, idx_y] = get_K_value(X1[idx_x], X2[idx_y], L, d)
+
+
+    window_idxs = [(i, j) for i, j in itertools.product(range(0, size, block_size), 
+                                                        range(0, size, block_size))]
+
+    p = Pool()
+    res = p.map(fill_per_window, window_idxs)
+    result = np.ctypeslib.as_array(shared_array)
+
+    return result
 
 def wdkernel_gram_matrix(X1, X2):
     '''
