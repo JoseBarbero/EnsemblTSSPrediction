@@ -43,8 +43,8 @@ def wdkernel_gram_matrix(X1, X2):
 
 
 def get_K_value(xi, xj, L, d):
-    print('xi', xi.shape)
-    print('xj', xj.shape)
+    print('xi', xi.shape, xi)
+    print('xj', xj.shape, xj)
     # Formula from https://www.jmlr.org/papers/volume7/sonnenburg06a/sonnenburg06a.pdf
     # First SUM
     E1 = 0
