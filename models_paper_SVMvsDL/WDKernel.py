@@ -35,7 +35,7 @@ def wdkernel_gram_matrix(X1, X2):
 
     for i in range(N1):
         for j in range(N2):
-            print(f'{N2*i+j:,}/{N1*N2:,}', end='\r', flush=True)
+            #print(f'{N2*i+j:,}/{N1*N2:,}', end='\r', flush=True)
             get_K_value(X1[i], X2[j], L, d)
 
     return K
@@ -51,6 +51,7 @@ def get_K_value(xi, xj, L, d):
         E2 = 0
         for l in range(L-k+1):  #Aquí no sumo 1 a cada lado del range porque son posiciones de una lista
             E2 += int(xi[l:l+k] == xj[l:l+k])
-            print(E2)
+            if E2 != 0:
+                print(E2)
         E1 += beta * E2
     return E1
