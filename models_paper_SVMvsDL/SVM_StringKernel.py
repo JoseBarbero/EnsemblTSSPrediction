@@ -12,7 +12,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score
+from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score, roc_auc_score, accuracy_score
 from sklearn.metrics import classification_report  # classfication summary
 import matplotlib.pyplot as plt
 import numpy as np
@@ -54,8 +54,8 @@ clf = SVC(kernel='precomputed')
 clf.fit(X_train_gram, y_train)
 
 # Prediction
-y_pred = clf.predict(X_test_gram)
-
+y_pred_test = clf.predict(X_test_gram)
+y_pred_train = clf.predict(X_train_gram)
 
 # Save results
 log_file = "logs/"+run_id+".log"
@@ -63,8 +63,15 @@ plot_file = "logs/"+run_id+".png"
 
 with open(log_file, 'w') as f:
     with redirect_stdout(f):
-        print(classification_report(y_test, y_pred))
+        print(classification_report(y_test, y_pred_test))
+        
+        print('Train results:')
+        print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
+        print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train_gram)))
 
+        print('Test results:')
+        print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
+        print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
 
 
 
