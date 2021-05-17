@@ -20,7 +20,7 @@ from sklearn.model_selection import KFold
 def cnn_lstm():
     model = Sequential()
 
-    model.add(Conv1D(filters=128, kernel_size=3, activation='relu', input_shape=(1003, 4)))
+    model.add(Conv1D(filters=128, kernel_size=3, data_format='channels_last', strides=1, activation='relu', input_shape=(1003, 4)))
     model.add(MaxPooling1D(3))
     model.add(Dropout(0.25))
     model.add(LSTM(128, return_sequences=True, go_backwards=False))
@@ -145,7 +145,6 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         summary_f.write('Mean auc_test: ')
         np.savetxt(summary_f, auc_test.mean())
 
-
 def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
 
     log_file = "logs/"+run_id+".log"
@@ -189,7 +188,6 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     with open(hist_file, 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
 
-#    plot_train_history(history.history, plot_file)
 
 
 

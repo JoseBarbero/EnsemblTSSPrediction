@@ -113,7 +113,6 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         with open(hist_file, 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
 
-#        plot_train_history(history.history, plot_file)
 
     with open(summary_file, 'wb') as summary_f:
         summary_f.write('accuracy_train: ')
@@ -155,7 +154,6 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         np.savetxt(summary_f, auc_val.mean())
         summary_f.write('Mean auc_test: ')
         np.savetxt(summary_f, auc_test.mean())
-
 
 def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
 
@@ -234,5 +232,5 @@ if __name__ == "__main__":
         #run_id = "".join(categories)
 
     
-    #single_train(cnn(), X_train, X_val, X_test, y_train, y_test, run_id)
+    #single_train(cnn(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
     k_train(cnn(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
