@@ -10,7 +10,7 @@ def beta_k(d, k):
 
 def fill_per_window(args):
         print(args)
-        (window_x, window_y), X1, X2, shared_array, L, d, block_size = args
+        window_x, window_y, X1, X2, shared_array, L, d, block_size = args
         tmp = np.ctypeslib.as_array(shared_array)
 
         for idx_x in range(window_x, window_x + block_size):
@@ -31,11 +31,11 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     K = np.ctypeslib.as_ctypes(np.zeros((size, size)))
     shared_array = sharedctypes.RawArray(K._type_, K)
 
-    window_idxs = [(i, j) for i, j in itertools.product(range(0, size, block_size), 
+    args = [(i, j, X1, X2, shared_array, L, d, block_size) for i, j in itertools.product(range(0, size, block_size), 
                                                         range(0, size, block_size))]
 
     p = Pool()
-    res = p.map(fill_per_window, [window_idxs, X1, X2, shared_array, L, d, block_size])
+    res = p.map(fill_per_window, args)
     result = np.ctypeslib.as_array(shared_array)
 
     return result
