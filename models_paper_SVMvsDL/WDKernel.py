@@ -54,8 +54,8 @@ def get_K_value(xi, xj, L, d):
         E2 = 0
         for l in range(L-k+1):  #Aquí no sumo 1 a cada lado del range porque son posiciones de una lista
             E2 += int(xi[l:l+k] == xj[l:l+k])
-            print('xi[l:l+k]', xi[l:l+k].shape)
-            print('xj[l:l+k]', xj[l:l+k].shape)
+            print('xi[l:l+k]', xi[l:l+k].shape, xi[l:l+k])
+            print('xj[l:l+k]', xj[l:l+k].shape, xj[l:l+k])
             input()
             #print(xi[l:l+k], xj[l:l+k], xi[l:l+k] == xj[l:l+k], int(xi[l:l+k] == xj[l:l+k]))
         E1 += beta * E2
