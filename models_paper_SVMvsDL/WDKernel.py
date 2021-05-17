@@ -38,8 +38,8 @@ def parallel_wdkernel_gram_matrix(X1, X2):
 
     # Divide the matrix by rows
     cores = 10
-    block_size = int(L/cores)
-    rows = [(startrow, startrow+block_size) if startrow+block_size <= L  else (startrow, L) for startrow in range(0, L, block_size)]
+    block_size = int(size/cores)
+    rows = [(startrow, startrow+block_size) if startrow+block_size <= size  else (startrow, size) for startrow in range(0, size, block_size)]
 
     # Shared array
     K = np.ctypeslib.as_ctypes(np.zeros((size, size)))
