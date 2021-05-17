@@ -13,8 +13,8 @@ def fill_per_window(args):
         tmp = np.ctypeslib.as_array(shared_array)
 
         for idx_x in range(inirow, endrow):
-            for idx_y in range(size):
-                tmp[idx_x, idx_y] = get_K_value(X_g[idx_x], X_g[idx_y], L, d_g)
+            for idx_y in range(n_cols):
+                tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
 
 
 def parallel_wdkernel_gram_matrix(X1, X2):
@@ -25,26 +25,30 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     d = 3
 
     # Needed for multiprocessing
-    global X_g
+    global X1_g
+    global X2_g
     global d_g
     global L
     global block_size
     global shared_array
-    global size
-    X_g = X1
+    global n_rows
+    global n_cols
+    X1_g = X1
+    X2_g = X2
     print('X1', X1.shape)
     print('X2', X2.shape)
     d_g = d
     L = len(X1[0])
-    size = X1.shape[0]
+    n_cols = X1.shape[0]
+    n_rows = X2.shape[0]
 
     # Divide the matrix by rows
     cores = 10
-    block_size = int(size/cores)
-    rows = [(startrow, startrow+block_size) if startrow+block_size <= size  else (startrow, size) for startrow in range(0, size, block_size)]
+    block_size = int(n_rows/cores)
+    rows = [(startrow, startrow+block_size) if startrow+block_size <= n_rows  else (startrow, n_rows) for startrow in range(0, n_rows, block_size)]
 
     # Shared array
-    K = np.ctypeslib.as_ctypes(np.zeros((size, size)))
+    K = np.ctypeslib.as_ctypes(np.zeros((n_rows, n_cols)))      
     shared_array = sharedctypes.RawArray(K._type_, K)
 
     

@@ -45,7 +45,7 @@ print('X_train shape:', X_train.shape)
 # Test
 X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
 y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
-X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_test)
+X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train)    # Importante que lo segundo sea la matriz de train
 print('X_test shape:', X_test.shape)
 
 
