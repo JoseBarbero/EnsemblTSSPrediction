@@ -51,5 +51,6 @@ def get_K_value(xi, xj, L, d):
         E2 = 0
         for l in range(L-k+1):  #Aquí no sumo 1 a cada lado del range porque son posiciones de una lista
             E2 += int(xi[l:l+k] == xj[l:l+k])
+            print(E2)
         E1 += beta * E2
     return E1
