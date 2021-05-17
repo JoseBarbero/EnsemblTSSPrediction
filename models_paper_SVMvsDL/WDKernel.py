@@ -9,7 +9,7 @@ def beta_k(d, k):
     return 2*((d-k+1)/(d*(d+1)))
 
 def fill_per_window(args):
-        window_x, window_y, X1, X2, shared_array, L, d, block_size = args
+        (window_x, window_y), X1, X2, shared_array, L, d, block_size = args
         tmp = np.ctypeslib.as_array(shared_array)
 
         for idx_x in range(window_x, window_x + block_size):
