@@ -25,14 +25,16 @@ if len(sys.argv) < 2:
 else:
     run_id = sys.argv[1]
 
+# Time
+start = time.time()
 
 # Read data
-X_train_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_pos.txt')[::10]
-X_train_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_neg.txt')[::100]
+X_train_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_pos.txt')[::100]
+X_train_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_neg.txt')[::1000]
 #X_val_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_val_TISseqs_pos.txt')
 #X_val_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_val_TISseqs_neg.txt')
-X_test_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_pos.txt')[::10]
-X_test_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_neg.txt')[::100]
+X_test_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_pos.txt')[::100]
+X_test_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_neg.txt')[::1000]
 
 
 # Train
@@ -73,7 +75,10 @@ with open(log_file, 'w') as f:
         print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
         print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
 
+        print('Number of support vectors for each class:', clf.n_support_)
 
+        # Time
+        print('Elapsed time:', time.time() - start)
 
 # Plot results
 y_score = clf.decision_function(X_test_gram)
