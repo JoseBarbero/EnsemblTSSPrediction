@@ -4,6 +4,7 @@ sys.path.append("../utils")
 from ReadData import seqfile_to_instances
 from WDKernel import wdkernel_gram_matrix, get_K_value, parallel_wdkernel_gram_matrix
 import time
+from datetime import timedelta
 from contextlib import redirect_stdout
 from strkernel.mismatch_kernel import MismatchKernel
 from strkernel.mismatch_kernel import preprocess
@@ -47,7 +48,7 @@ print('X_train shape:', X_train.shape)
 # Test
 X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
 y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
-X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train)    # Importante que lo segundo sea la matriz de train
+X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train)    # Importante que lo segundo sea la matriz de train https://stackoverflow.com/questions/26962159/how-to-use-a-custom-svm-kernel
 print('X_test shape:', X_test.shape)
 
 
@@ -75,10 +76,11 @@ with open(log_file, 'w') as f:
         print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
         print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
 
+        # https://scikit-learn.org/stable/modules/svm.html
         print('Number of support vectors for each class:', clf.n_support_)
 
         # Time
-        print('Elapsed time:', time.time() - start)
+        print('Elapsed time:', str(timedelta(seconds=time.time() - start)))
 
 # Plot results
 y_score = clf.decision_function(X_test_gram)
