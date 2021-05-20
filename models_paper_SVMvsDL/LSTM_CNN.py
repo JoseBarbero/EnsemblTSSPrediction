@@ -217,12 +217,12 @@ if __name__ == "__main__":
     y_test_file.close()
 
     # TODO
-    print('X_train has nan:', np.any(X_train, None))
-    print('y_train has nan:', np.any(y_train, None))
-    print('X_val has nan:', np.any(X_val, None))
-    print('y_val has nan:', np.any(y_val, None))
-    print('X_test has nan:', np.any(X_test, None))
-    print('y_test has nan:', np.any(y_test, None))
+    print('X_train has nan:', (X_train == None).sum())
+    print('y_train has nan:', (y_train == None).sum())
+    print('X_val has nan:', (X_val == None).sum())
+    print('y_val has nan:', (y_val == None).sum())
+    print('X_test has nan:', (X_test == None).sum())
+    print('y_test has nan:', (y_test == None).sum())
     
     
     if len(sys.argv) < 2:
