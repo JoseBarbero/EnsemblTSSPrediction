@@ -20,10 +20,10 @@ from sklearn.model_selection import KFold
 def cnn_lstm():
     model = Sequential()
 
-    model.add(Conv1D(filters=128, kernel_size=3, data_format='channels_last', activation='relu', input_shape=(1003, 4)))
+    model.add(Conv1D(filters=64, kernel_size=3, data_format='channels_last', activation='relu', input_shape=(1003, 4)))
     model.add(MaxPooling1D(3))
     model.add(Dropout(0.25))
-    model.add(LSTM(128, return_sequences=True, go_backwards=False))
+    model.add(LSTM(64, return_sequences=True, go_backwards=False))
     model.add(Dropout(0.8))
     model.add(Flatten())
     model.add(Dense(1, activation = 'sigmoid'))
@@ -215,15 +215,6 @@ if __name__ == "__main__":
     y_val_file.close()
     X_test_file.close()
     y_test_file.close()
-
-    # TODO
-    print('X_train has nan:', (X_train == None).sum())
-    print('y_train has nan:', (y_train == None).sum())
-    print('X_val has nan:', (X_val == None).sum())
-    print('y_val has nan:', (y_val == None).sum())
-    print('X_test has nan:', (X_test == None).sum())
-    print('y_test has nan:', (y_test == None).sum())
-    
     
     if len(sys.argv) < 2:
         run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
