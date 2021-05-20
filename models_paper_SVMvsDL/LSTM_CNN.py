@@ -28,7 +28,7 @@ def cnn_lstm():
     model.add(Flatten())
     model.add(Dense(1, activation = 'sigmoid'))
 
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
+    model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001), loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
 
     return model
 
