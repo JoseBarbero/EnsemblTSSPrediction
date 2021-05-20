@@ -20,7 +20,7 @@ from sklearn.model_selection import KFold
 def cnn_lstm():
     model = Sequential()
 
-    model.add(Conv1D(filters=128, kernel_size=3, data_format='channels_last', strides=1, activation='relu', input_shape=(1003, 4)))
+    model.add(Conv1D(filters=128, kernel_size=3, data_format='channels_last', activation='relu', input_shape=(1003, 4)))
     model.add(MaxPooling1D(3))
     model.add(Dropout(0.25))
     model.add(LSTM(128, return_sequences=True, go_backwards=False))
@@ -215,6 +215,15 @@ if __name__ == "__main__":
     y_val_file.close()
     X_test_file.close()
     y_test_file.close()
+
+    # TODO
+    print('X_train has nan:', np.isnan(X_train))
+    print('y_train has nan:', np.isnan(y_train))
+    print('X_val has nan:', np.isnan(X_val))
+    print('y_val has nan:', np.isnan(y_val))
+    print('X_test has nan:', np.isnan(X_test))
+    print('y_test has nan:', np.isnan(y_test))
+    
     
     if len(sys.argv) < 2:
         run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]

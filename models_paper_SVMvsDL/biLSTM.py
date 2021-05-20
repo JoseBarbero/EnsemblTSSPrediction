@@ -192,52 +192,6 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     plot_train_history(history.history, plot_file)
 
 
-def single_train(model_definition, X_train, X_val, X_test, Y_train, Y_test, runid):
-
-    log_file = "logs/"+run_id+".log"
-    hist_file = "logs/"+run_id+".pkl"
-    plot_file = "logs/"+run_id+".png"  
-
-    logdir = os.path.dirname(log_file)
-    if not os.path.exists(logdir):
-        os.mkdir(logdir)
-
-    model = model_definition
-    model.build(X_train.shape)
-    model.summary()
-
-    with open(log_file, 'w') as f:
-        with redirect_stdout(f):
-            model.summary()
-
-            for layer in model.layers:
-                print(layer.get_config())
-            early_stopping_monitor = EarlyStopping( monitor='val_loss', min_delta=0, patience=10, 
-                                                    verbose=1, mode='min', baseline=None,
-                                                    restore_best_weights=True)
-            reduce_lr_loss = ReduceLROnPlateau(monitor='val_auc', factor=0.5, patience=3, verbose=1, min_delta=1e-4, mode='max')
-
-            history = model.fit(X_train, y_train,
-                                shuffle=True,
-                                batch_size=32,
-                                epochs=100,
-                                verbose=True,
-                                validation_data=(X_val, y_val),
-                                callbacks=[early_stopping_monitor, reduce_lr_loss])
-            print("Train results:\n")
-            test_results(X_train, y_train, model)
-            print("Val results:\n")
-            test_results(X_val, y_val, model)
-            print("Test results:\n")
-            test_results(X_test, y_test, model)
-            
-
-    with open(hist_file, 'wb') as file_pi:
-        pickle.dump(history.history, file_pi)
-
-#    plot_train_history(history.history, plot_file)
-
-
 if __name__ == "__main__":
     seed = 42
     np.random.seed(seed)
