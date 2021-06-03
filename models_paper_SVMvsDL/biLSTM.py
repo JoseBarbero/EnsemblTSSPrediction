@@ -54,6 +54,7 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         log_file = "logs/"+run_id+str(k)+".log"
         hist_file = "logs/"+run_id+str(k)+".pkl"
         plot_file = "logs/"+run_id+str(k)+".png"
+        model_file = "logs/"+run_id+str(k)+".h5"
 
         logdir = os.path.dirname(log_file)
         if not os.path.exists(logdir):
@@ -102,7 +103,8 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         with open(hist_file, 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
 
-        plot_train_history(history.history, plot_file)
+        model.save(model_file)
+    
 
     with open(summary_file, 'wb') as summary_f:
         summary_f.write('accuracy_train: ')
@@ -145,12 +147,12 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         summary_f.write('Mean auc_test: ')
         np.savetxt(summary_f, auc_test.mean())
 
-
 def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
 
     log_file = "logs/"+run_id+".log"
     hist_file = "logs/"+run_id+".pkl"
-    plot_file = "logs/"+run_id+".png"  
+    plot_file = "logs/"+run_id+".png" 
+    model_file = "logs/"+run_id+".h5"
 
     logdir = os.path.dirname(log_file)
     if not os.path.exists(logdir):
@@ -189,6 +191,8 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     with open(hist_file, 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
 
+
+    model.save(model_file)
     plot_train_history(history.history, plot_file)
 
 

@@ -16,29 +16,18 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras_self_attention import SeqSelfAttention
 from keras.callbacks import LearningRateScheduler
 
-def cnn():
-    model = Sequential()
+def bilstm():
+    sequence_input = tf.keras.layers.Input(shape=(1003,4))
 
-    model.add(Conv1D(filters=32, kernel_size=5, data_format='channels_last', strides=1, activation='relu', input_shape=(1003, 4)))
-    model.add(MaxPooling1D(4))
+    x = tf.keras.layers.LSTM(units=128, return_sequences=True, input_shape=(1003,4))(sequence_input)
+    x = tf.keras.layers.Dense(64)(x)
+    x = tf.keras.layers.Dropout(0.5)(x)
+    x = tf.keras.layers.Activation('relu')(x)
+    x = tf.keras.layers.Flatten()(x)
+    output = tf.keras.layers.Dense(1)(x)
+    output = tf.keras.layers.Activation('sigmoid')(output)
 
-    model.add(Conv1D(filters=32, kernel_size=5, strides=1, activation='relu'))
-    model.add(MaxPooling1D(4))
-
-    model.add(Conv1D(filters=32, kernel_size=5, strides=1, activation='relu'))
-    model.add(MaxPooling1D(4))
-
-    model.add(Dense(1024, activation = 'relu'))
-    model.add(Dropout(0.2))
-    model.add(Dense(512, activation = 'relu'))
-    model.add(Dropout(0.2))
-    model.add(Dense(128, activation = 'relu'))
-    model.add(Dropout(0.2))
-
-    model.add(Flatten())
-
-    model.add(Dense(1, activation = 'sigmoid'))
-                                                                      
+    model = tf.keras.Model(inputs=sequence_input, outputs=output)
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
 
     return model
@@ -114,8 +103,8 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         with open(hist_file, 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
 
-        model.save(model_file)  
-
+        model.save(model_file)
+    
 
     with open(summary_file, 'wb') as summary_f:
         summary_f.write('accuracy_train: ')
@@ -162,7 +151,7 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
     log_file = "logs/"+run_id+".log"
     hist_file = "logs/"+run_id+".pkl"
-    plot_file = "logs/"+run_id+".png"
+    plot_file = "logs/"+run_id+".png" 
     model_file = "logs/"+run_id+".h5"
 
     logdir = os.path.dirname(log_file)
@@ -202,8 +191,10 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     with open(hist_file, 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
 
+
     model.save(model_file)
     plot_train_history(history.history, plot_file)
+
 
 if __name__ == "__main__":
     seed = 42
@@ -236,6 +227,4 @@ if __name__ == "__main__":
         run_id = sys.argv[1]
         #run_id = "".join(categories)
 
-    
-    #single_train(cnn(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    k_train(cnn(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    single_train(bilstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
