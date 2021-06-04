@@ -17,7 +17,7 @@ from keras_self_attention import SeqSelfAttention
 from keras.callbacks import LearningRateScheduler
 from sklearn.model_selection import KFold
 
-def cnn_lstm():
+def cnn_blstm():
     model = Sequential()
 
     model.add(Conv1D(filters=64, kernel_size=3, data_format='channels_last', activation='relu', input_shape=(1003, 4)))
@@ -224,4 +224,5 @@ if __name__ == "__main__":
     else:
         run_id = sys.argv[1]
     
-    single_train(cnn_lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #single_train(cnn_lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    k_train(cnn_blstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)

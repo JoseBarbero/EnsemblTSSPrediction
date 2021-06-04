@@ -16,7 +16,7 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras_self_attention import SeqSelfAttention
 from keras.callbacks import LearningRateScheduler
 
-def bilstm():
+def lstm():
     sequence_input = tf.keras.layers.Input(shape=(1003,4))
 
     x = tf.keras.layers.LSTM(units=128, return_sequences=True, input_shape=(1003,4))(sequence_input)
@@ -227,4 +227,5 @@ if __name__ == "__main__":
         run_id = sys.argv[1]
         #run_id = "".join(categories)
 
-    single_train(bilstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #single_train(lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    k_train(lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
