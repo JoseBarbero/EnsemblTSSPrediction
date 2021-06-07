@@ -94,7 +94,7 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
                 with open(hist_file, 'wb') as file_pi:
                     pickle.dump(history.history, file_pi)
 
-                plot_train_history(history.history, plot_file)
+                # plot_train_history(history.history, plot_file)
         
         binarycrossentropy_train[k], accuracy_train[k], auc_train[k] = model.evaluate(X_train, y_train, verbose=False)
         binarycrossentropy_val[k], accuracy_val[k], auc_val[k] = model.evaluate(X_val, y_val, verbose=False)
