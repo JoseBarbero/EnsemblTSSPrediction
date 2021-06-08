@@ -38,7 +38,7 @@ def cnn():
 
     model.add(Dense(1, activation = 'sigmoid'))
                                                                       
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
+    
 
     return model
 
@@ -169,6 +169,7 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
         os.mkdir(logdir)
 
     model = model_definition
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
     model.build(X_train.shape)
 
     with open(log_file, 'w') as f:
