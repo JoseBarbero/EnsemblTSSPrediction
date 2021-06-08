@@ -170,7 +170,7 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
     model = model_definition
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
-    model.build(X_train.shape)
+    
 
     with open(log_file, 'w') as f:
         with redirect_stdout(f):
