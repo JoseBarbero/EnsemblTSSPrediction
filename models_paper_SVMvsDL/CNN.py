@@ -170,7 +170,6 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
     model = model_definition
     model.build(X_train.shape)
-    model.summary()
 
     with open(log_file, 'w') as f:
         with redirect_stdout(f):
