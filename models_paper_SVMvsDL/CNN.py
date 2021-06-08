@@ -237,5 +237,5 @@ if __name__ == "__main__":
         #run_id = "".join(categories)
 
     
-    #single_train(cnn(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    k_train(cnn(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    single_train(cnn(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #k_train(cnn(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)

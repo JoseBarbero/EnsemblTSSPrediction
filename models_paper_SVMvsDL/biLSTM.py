@@ -227,5 +227,5 @@ if __name__ == "__main__":
         run_id = sys.argv[1]
         #run_id = "".join(categories)
 
-    #single_train(bilstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    k_train(bilstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    single_train(bilstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #k_train(bilstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
