@@ -13,7 +13,6 @@ from keras import layers
 from keras.models import Sequential
 from keras.layers import Conv1D, Conv2D, Conv3D, Dropout, MaxPooling1D, MaxPooling2D, Flatten, Dense
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from keras_self_attention import SeqSelfAttention
 from keras.callbacks import LearningRateScheduler
 
 def bilstm():
