@@ -106,7 +106,7 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         model.save(model_file)
     
 
-    with open(summary_file, 'wb') as summary_f:
+    with open(summary_file, 'w') as summary_f:
         summary_f.write('accuracy_train: ')
         np.savetxt(summary_f, accuracy_train)
         summary_f.write('accuracy_val: ')
