@@ -15,6 +15,7 @@ from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score, roc_auc_score, accuracy_score
 from sklearn.metrics import classification_report  # classfication summary
+from sklearn.metrics import log_loss
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import random
@@ -29,13 +30,14 @@ else:
 # Time
 start = time.time()
 
+
 # Read data
-X_train_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_pos.txt')#[::10]
-X_train_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_train_TISseqs_neg.txt')[::10]
-#X_val_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_val_TISseqs_pos.txt')
-#X_val_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_val_TISseqs_neg.txt')
-X_test_seqs_pos = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_pos.txt')#[::10]
-X_test_seqs_neg = seqfile_to_instances('../data/TIS/seqs/X_test_TISseqs_neg.txt')[::10]
+X_train_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_pos.txt')[::10]
+X_train_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_neg.txt')[::100]
+#X_val_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_val_TSSseqs_pos.txt')
+#X_val_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_val_TSSseqs_neg.txt')
+X_test_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_pos.txt')[::10]
+X_test_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_neg.txt')[::100]
 
 
 # Train
@@ -70,10 +72,12 @@ with open(log_file, 'w') as f:
         
         print('Train results:')
         print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
+        print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))
         print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train_gram)))
 
         print('Test results:')
         print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
+        print('\tBinary crossentropy:', log_loss(y_test, y_pred_test))
         print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
 
         # https://scikit-learn.org/stable/modules/svm.html
