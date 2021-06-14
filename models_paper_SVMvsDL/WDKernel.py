@@ -43,7 +43,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     n_cols = X2.shape[0]
 
     # Divide the matrix by rows
-    cores = 12
+    cores = 20
     block_size = int(n_rows/cores)
     rows = [(startrow, startrow+block_size) if startrow+block_size <= n_rows  else (startrow, n_rows) for startrow in range(0, n_rows, block_size)]
 
