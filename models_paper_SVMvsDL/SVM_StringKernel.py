@@ -32,11 +32,11 @@ start = time.time()
 
 
 # Read data
-X_train_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_pos.txt')[::100]
+X_train_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_pos.txt')[::10]
 X_train_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_neg.txt')[::100]
 #X_val_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_val_TSSseqs_pos.txt')
 #X_val_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_val_TSSseqs_neg.txt')
-X_test_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_pos.txt')[::100]
+X_test_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_pos.txt')[::10]
 X_test_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_neg.txt')[::100]
 
 
