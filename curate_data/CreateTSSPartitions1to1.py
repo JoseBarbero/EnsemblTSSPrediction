@@ -87,9 +87,9 @@ x_train_pos = get_pos_seqs(train_df)
 x_val_pos = get_pos_seqs(val_df)
 x_test_pos = get_pos_seqs(test_df)
 
-x_train_neg = get_neg_seqs(train_df, 10)
-x_val_neg = get_neg_seqs(val_df, 10)
-x_test_neg = get_neg_seqs(test_df, 10)
+x_train_neg = get_neg_seqs(train_df, 1)
+x_val_neg = get_neg_seqs(val_df, 1)
+x_test_neg = get_neg_seqs(test_df, 1)
 
 
 y_train_pos = np.ones((x_train_pos.shape[0], 1))
