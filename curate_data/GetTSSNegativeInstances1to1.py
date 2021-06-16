@@ -13,8 +13,8 @@ We keep those 10 negative instances in a new column of the dataframe as a list. 
 
 
 POS_INSTANCES_DF = '../rawdata/TSS/EveryEnsemblTranscript_withTSS_dataframe.csv'
-POS_TO_NEG_RATIO = 1   # We generate N negative instances for every positive one
-DATAFRAME_OUT_FILE = '../rawdata/TSS/EveryEnsemblTranscript_pos_and_neg_TSS.csv'
+POS_TO_NEG_RATIO = 1   # We generate 1 negative instance for every positive one
+DATAFRAME_OUT_FILE = '../rawdata/TSS/EveryEnsemblTranscript_pos_and_neg_TSS_1to1.csv'
 
 
 ensembl_df = pd.read_csv(POS_INSTANCES_DF)
