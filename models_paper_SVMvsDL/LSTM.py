@@ -196,35 +196,37 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
 
 if __name__ == "__main__":
-    seed = 42
-    np.random.seed(seed)
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:1", "/gpu:2"])
+    with strategy.scope():
+        seed = 42
+        np.random.seed(seed)
 
-    X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS_1to1.pkl', 'rb')
-    y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS_1to1.pkl', 'rb')
-    X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS_1to1.pkl', 'rb')
-    y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS_1to1.pkl', 'rb')
-    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS_1to1.pkl', 'rb')
-    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS_1to1.pkl', 'rb')
+        X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS_1to1.pkl', 'rb')
+        y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS_1to1.pkl', 'rb')
+        X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS_1to1.pkl', 'rb')
+        y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS_1to1.pkl', 'rb')
+        X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS_1to1.pkl', 'rb')
+        y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS_1to1.pkl', 'rb')
 
-    X_train = pickle.load(X_train_file)
-    y_train = pickle.load(y_train_file)
-    X_val = pickle.load(X_val_file)
-    y_val = pickle.load(y_val_file)
-    X_test = pickle.load(X_test_file)
-    y_test = pickle.load(y_test_file)
+        X_train = pickle.load(X_train_file)
+        y_train = pickle.load(y_train_file)
+        X_val = pickle.load(X_val_file)
+        y_val = pickle.load(y_val_file)
+        X_test = pickle.load(X_test_file)
+        y_test = pickle.load(y_test_file)
 
-    X_train_file.close()
-    y_train_file.close()
-    X_val_file.close()
-    y_val_file.close()
-    X_test_file.close()
-    y_test_file.close()
-    
-    if len(sys.argv) < 2:
-        run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
-    else:
-        run_id = sys.argv[1]
-        #run_id = "".join(categories)
+        X_train_file.close()
+        y_train_file.close()
+        X_val_file.close()
+        y_val_file.close()
+        X_test_file.close()
+        y_test_file.close()
+        
+        if len(sys.argv) < 2:
+            run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
+        else:
+            run_id = sys.argv[1]
+            #run_id = "".join(categories)
 
-    single_train(lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    #k_train(lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+        single_train(lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+        #k_train(lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
