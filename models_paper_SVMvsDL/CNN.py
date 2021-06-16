@@ -164,6 +164,26 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     plot_file = "logs/"+run_id+".png"
     model_file = "logs/"+run_id+".h5"
 
+    # Needed for multi-gpu
+    train_data = tf.data.Dataset.from_tensor_slices((X_train, y_train))
+    val_data = tf.data.Dataset.from_tensor_slices((X_val, y_val))
+    
+    batch_size = 32
+    train_data = train_data.batch(batch_size)
+    val_data = val_data.batch(batch_size)
+    
+    if len(sys.argv) < 2:
+        run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
+    else:
+        run_id = sys.argv[1]
+        #run_id = "".join(categories)
+
+    # Disable AutoShard.
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.OFF
+    train_data = train_data.with_options(options)
+    val_data = val_data.with_options(options)
+
     logdir = os.path.dirname(log_file)
     if not os.path.exists(logdir):
         os.mkdir(logdir)
@@ -183,12 +203,12 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
                                                     restore_best_weights=True)
             reduce_lr_loss = ReduceLROnPlateau(monitor='val_auc', factor=0.5, patience=3, verbose=1, min_delta=1e-4, mode='max')
 
-            history = model.fit(X_train, y_train,
+            history = model.fit(train_data,
                                 shuffle=True,
                                 batch_size=32,
                                 epochs=100,
                                 verbose=True,
-                                validation_data=(X_val, y_val),
+                                validation_data=val_data,
                                 callbacks=[early_stopping_monitor, reduce_lr_loss])
             print("Train results:\n")
             test_results(X_train, y_train, model)
@@ -231,6 +251,7 @@ if __name__ == "__main__":
         y_val_file.close()
         X_test_file.close()
         y_test_file.close()
+        
         
         if len(sys.argv) < 2:
             run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
