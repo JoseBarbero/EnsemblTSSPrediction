@@ -22,7 +22,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     
 
     
-    d = 1
+    d = 10
 
     # Needed for multiprocessing
     global X1_g
