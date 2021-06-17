@@ -201,8 +201,8 @@ if __name__ == "__main__":
     y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS_1to1.pkl', 'rb')
     X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS_1to1.pkl', 'rb')
     y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS_1to1.pkl', 'rb')
-    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS_1to1.pkl', 'rb')
-    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS_1to1.pkl', 'rb')
+    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
+    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
 
     X_train = pickle.load(X_train_file)
     y_train = pickle.load(y_train_file)
