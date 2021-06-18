@@ -65,6 +65,9 @@ y_pred_train = clf.predict(X_train_gram)
 # Save results
 log_file = "logs/"+run_id+".log"
 plot_file = "logs/"+run_id+".png"
+model_file = "logs/"++".pkl"
+
+pickle.dump(clf, open(model_file, 'wb'))
 
 with open(log_file, 'w') as f:
     with redirect_stdout(f):
