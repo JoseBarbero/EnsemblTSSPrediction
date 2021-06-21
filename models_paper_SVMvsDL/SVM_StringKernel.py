@@ -41,14 +41,14 @@ X_test_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_neg.txt'
 # Train
 X_train = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
 y_train = np.concatenate([np.ones(len(X_train_seqs_pos), dtype=int), np.zeros(len(X_train_seqs_neg), dtype=int)])
-X_train_gram = parallel_wdkernel_gram_matrix(X_train, X_train)
+X_train_gram = wdkernel_gram_matrix(X_train, X_train)
 print('X_train shape:', X_train.shape)
 
 
 # Test
 X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
 y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
-X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train)    # Importante que lo segundo sea la matriz de train https://stackoverflow.com/questions/26962159/how-to-use-a-custom-svm-kernel
+X_test_gram = wdkernel_gram_matrix(X_test, X_train)    # Importante que lo segundo sea la matriz de train https://stackoverflow.com/questions/26962159/how-to-use-a-custom-svm-kernel
 print('X_test shape:', X_test.shape)
 
 
