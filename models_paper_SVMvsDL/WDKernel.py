@@ -1,4 +1,5 @@
 import numpy as np
+from numba import jit
 import itertools
 from multiprocessing import Pool #  Process pool
 from multiprocessing import sharedctypes
@@ -22,7 +23,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     
 
     
-    d = 20
+    d = 10
 
     # Needed for multiprocessing
     global X1_g
@@ -92,7 +93,7 @@ def wdkernel_gram_matrix(X1, X2):
 
     return K
 
-
+@jit(nopython=True)
 def get_K_value(xi, xj, L, d):
     # Formula from https://www.jmlr.org/papers/volume7/sonnenburg06a/sonnenburg06a.pdf
     # First SUM
