@@ -4,7 +4,7 @@ import itertools
 from multiprocessing import Pool #  Process pool
 from multiprocessing import sharedctypes
 
-
+@jit
 def beta_k(d, k):
     # Formula from https://www.jmlr.org/papers/volume7/sonnenburg06a/sonnenburg06a.pdf
     return 2*((d-k+1)/(d*(d+1)))
@@ -93,7 +93,7 @@ def wdkernel_gram_matrix(X1, X2):
             K[i, j] = get_K_value(X1[i], X2[j], L, d)
 
     return K
-
+@jit
 def get_K_value(xi, xj, L, d):
     # Formula from https://www.jmlr.org/papers/volume7/sonnenburg06a/sonnenburg06a.pdf
     # First SUM
