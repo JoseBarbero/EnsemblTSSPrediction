@@ -208,26 +208,29 @@ if __name__ == "__main__":
     seed = 42
     np.random.seed(seed)
 
-    X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS_1to1.pkl', 'rb')
-    y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS_1to1.pkl', 'rb')
-    X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS_1to1.pkl', 'rb')
-    y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS_1to1.pkl', 'rb')
-    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
-    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+    X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
+    y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
+    # X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS_1to1.pkl', 'rb')
+    # y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS_1to1.pkl', 'rb')
+    # X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
+    # y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
 
     X_train = pickle.load(X_train_file)
-    y_train = pickle.load(y_train_file)
-    X_val = pickle.load(X_val_file)
-    y_val = pickle.load(y_val_file)
-    X_test = pickle.load(X_test_file)
-    y_test = pickle.load(y_test_file)
+    print(X_train.shape)
+    X_train = X_train[::2]
+    print(X_train.shape)
+    # y_train = pickle.load(y_train_file)
+    # X_val = pickle.load(X_val_file)
+    # y_val = pickle.load(y_val_file)
+    # X_test = pickle.load(X_test_file)
+    # y_test = pickle.load(y_test_file)
 
-    X_train_file.close()
-    y_train_file.close()
-    X_val_file.close()
-    y_val_file.close()
-    X_test_file.close()
-    y_test_file.close()
+    # X_train_file.close()
+    # y_train_file.close()
+    # X_val_file.close()
+    # y_val_file.close()
+    # X_test_file.close()
+    # y_test_file.close()
     
     if len(sys.argv) < 2:
         run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
