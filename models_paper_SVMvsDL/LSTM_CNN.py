@@ -193,39 +193,39 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
 
 if __name__ == "__main__":
-    
-    seed = 42
-    np.random.seed(seed)
+    with tf.device('/device:GPU:2'):
+        seed = 42
+        np.random.seed(seed)
 
-    X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
-    y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
-    X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS.pkl', 'rb')
-    y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS.pkl', 'rb')
-    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
-    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+        X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
+        y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
+        X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS.pkl', 'rb')
+        y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS.pkl', 'rb')
+        X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
+        y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
 
-    X_train = pickle.load(X_train_file)
-    X_train = X_train[::10]
-    y_train = pickle.load(y_train_file)
-    y_train = y_train[::10]
-    X_val = pickle.load(X_val_file)
-    X_val = X_val[::10]
-    y_val = pickle.load(y_val_file)
-    y_val = y_val[::10]
-    X_test = pickle.load(X_test_file)
-    y_test = pickle.load(y_test_file)
+        X_train = pickle.load(X_train_file)
+        X_train = X_train[::10]
+        y_train = pickle.load(y_train_file)
+        y_train = y_train[::10]
+        X_val = pickle.load(X_val_file)
+        X_val = X_val[::10]
+        y_val = pickle.load(y_val_file)
+        y_val = y_val[::10]
+        X_test = pickle.load(X_test_file)
+        y_test = pickle.load(y_test_file)
 
-    X_train_file.close()
-    y_train_file.close()
-    X_val_file.close()
-    y_val_file.close()
-    X_test_file.close()
-    y_test_file.close()
-    
-    if len(sys.argv) < 2:
-        run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
-    else:
-        run_id = sys.argv[1]
-    
-    single_train(cnn_lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    #k_train(cnn_lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+        X_train_file.close()
+        y_train_file.close()
+        X_val_file.close()
+        y_val_file.close()
+        X_test_file.close()
+        y_test_file.close()
+        
+        if len(sys.argv) < 2:
+            run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
+        else:
+            run_id = sys.argv[1]
+        
+        single_train(cnn_lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+        #k_train(cnn_lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
