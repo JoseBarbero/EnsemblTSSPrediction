@@ -13,7 +13,7 @@ def fill_per_window(args):
         tmp = np.ctypeslib.as_array(shared_array)
 
         for idx_x in range(inirow, endrow):
-            for idx_y in range(n_cols):
+            for idx_y in range(idx_x, n_cols):
                 if tmp[idx_y, idx_x] == 0:
                     tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
                 else:
