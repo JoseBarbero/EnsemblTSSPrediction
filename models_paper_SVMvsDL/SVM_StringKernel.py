@@ -6,8 +6,6 @@ from WDKernel import wdkernel_gram_matrix, get_K_value, parallel_wdkernel_gram_m
 import time
 from datetime import timedelta
 from contextlib import redirect_stdout
-from strkernel.mismatch_kernel import MismatchKernel
-from strkernel.mismatch_kernel import preprocess
 from datetime import datetime
 from Bio import SeqIO
 from Bio.Seq import Seq
