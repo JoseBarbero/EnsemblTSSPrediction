@@ -15,9 +15,10 @@ def fill_per_window(args):
         for idx_x in range(inirow, endrow):
             for idx_y in range(n_cols):
                 if tmp[idx_y, idx_x] == 0:
+                    print('Doesn\'t exist:', tmp[idx_y, idx_x])
                     tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
                 else:
-                    print('Already exists')
+                    print('Already exists:', tmp[idx_y, idx_x])
                     tmp[idx_x, idx_y] = tmp[idx_y, idx_x]
 
 
