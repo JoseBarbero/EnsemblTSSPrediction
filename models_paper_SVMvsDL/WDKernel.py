@@ -14,10 +14,9 @@ def fill_per_window(args):
 
         for idx_x in range(inirow, endrow):
             for idx_y in range(idx_x, n_cols):
-                if tmp[idx_y, idx_x] == 0:
-                    tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
-                else:
-                    tmp[idx_x, idx_y] = tmp[idx_y, idx_x]
+                tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
+                tmp[idx_y, idx_x] = tmp[idx_x, idx_y]
+                
 
 
 def old_parallel_wdkernel_gram_matrix(X1, X2):
@@ -86,7 +85,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
 
     # Divide the matrix by rows
     cores = 20
-    block_size = 1
+    block_size = 100
     rows = [(startrow, startrow+block_size) if startrow+block_size <= n_rows  else (startrow, n_rows) for startrow in range(0, n_rows, block_size)]
 
     # Shared array
