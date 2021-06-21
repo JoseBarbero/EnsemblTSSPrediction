@@ -89,7 +89,7 @@ def wdkernel_gram_matrix(X1, X2):
 
     for i in range(N1):
         for j in range(N2):
-            print(f'{N2*i+j:,}/{N1*N2:,}', end='\r', flush=True)
+            #print(f'{N2*i+j:,}/{N1*N2:,}', end='\r', flush=True)
             K[i, j] = get_K_value(X1[i], X2[j], L, d)
 
     return K
