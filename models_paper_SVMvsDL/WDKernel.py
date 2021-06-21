@@ -17,7 +17,7 @@ def fill_per_window(args):
                 if tmp[idx_y, idx_x] == 0:
                     tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
                 else:
-gi                    tmp[idx_x, idx_y] = tmp[idx_y, idx_x]
+                    tmp[idx_x, idx_y] = tmp[idx_y, idx_x]
 
 
 def old_parallel_wdkernel_gram_matrix(X1, X2):
