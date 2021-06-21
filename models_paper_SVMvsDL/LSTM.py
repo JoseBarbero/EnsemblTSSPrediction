@@ -208,7 +208,9 @@ if __name__ == "__main__":
     y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
 
     X_train = pickle.load(X_train_file)
+    print(X_train.shape)
     X_train = X_train[::10]
+    print(X_train.shape)
     y_train = pickle.load(y_train_file)
     y_train = y_train[::10]
     X_val = pickle.load(X_val_file)
