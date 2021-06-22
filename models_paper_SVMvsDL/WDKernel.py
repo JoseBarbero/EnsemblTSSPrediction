@@ -18,48 +18,6 @@ def fill_per_window(args):
                 tmp[idx_y, idx_x] = tmp[idx_x, idx_y]
                 
 
-
-def old_parallel_wdkernel_gram_matrix(X1, X2):
-    # https://jonasteuwen.github.io/numpy/python/multiprocessing/2017/01/07/multiprocessing-numpy-array.html
-    
-    d = 10
-
-    # Needed for multiprocessing
-    global X1_g
-    global X2_g
-    global d_g
-    global L
-    global block_size
-    global shared_array
-    global n_rows
-    global n_cols
-    X1_g = X1
-    X2_g = X2
-    print('X1', X1.shape)
-    print('X2', X2.shape)
-    d_g = d
-    L = len(X1[0])
-    n_rows = X1.shape[0]
-    n_cols = X2.shape[0]
-
-    # Divide the matrix by rows
-    cores = 20
-    block_size = int(n_rows/cores)
-    rows = [(startrow, startrow+block_size) if startrow+block_size <= n_rows  else (startrow, n_rows) for startrow in range(0, n_rows, block_size)]
-
-    # Shared array
-    K = np.ctypeslib.as_ctypes(np.zeros((n_rows, n_cols)))      
-    shared_array = sharedctypes.RawArray(K._type_, K)
-
-    
-    print(rows)
-    p = Pool()
-    res = p.map(fill_per_window, rows)
-    result = np.ctypeslib.as_array(shared_array)
-
-    return result
-
-
 def parallel_wdkernel_gram_matrix(X1, X2):
     # https://jonasteuwen.github.io/numpy/python/multiprocessing/2017/01/07/multiprocessing-numpy-array.html
     
@@ -85,7 +43,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
 
     # Divide the matrix by rows
     cores = 20
-    block_size = 100
+    block_size = int(n_rows/cores)
     rows = [(startrow, startrow+block_size) if startrow+block_size <= n_rows  else (startrow, n_rows) for startrow in range(0, n_rows, block_size)]
 
     # Shared array
