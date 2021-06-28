@@ -2,6 +2,7 @@ import numpy as np
 import itertools
 from multiprocessing import Pool #  Process pool
 from multiprocessing import sharedctypes
+from itertools import groupby
 
 
 def beta_k(d, k):
@@ -32,8 +33,8 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     global shared_array
     global n_rows
     global n_cols
-    X1_g = X1
-    X2_g = X2
+    X1_g = np.array(list(X1))
+    X2_g = np.array(list(X2))
     print('X1', X1.shape)
     print('X2', X2.shape)
     d_g = d
@@ -93,7 +94,7 @@ def wdkernel_gram_matrix(X1, X2):
     return K
 
 
-def get_K_value(xi, xj, L, d):
+def old_get_K_value(xi, xj, L, d):
     # Formula from https://www.jmlr.org/papers/volume7/sonnenburg06a/sonnenburg06a.pdf
     # First SUM
     E1 = 0
@@ -105,3 +106,19 @@ def get_K_value(xi, xj, L, d):
             E2 += int(xi[l:l+k] == xj[l:l+k])
         E1 += beta * E2
     return E1
+
+def get_K_value(xi, xj, L, d):
+    # Versión optimizada (mucho menos legible)
+    # Más rápida en cadenas largas. Más lenta en cortas.
+    E1 = 0
+    groups = groupby(xi == xj) # Para comparar caracter a caracter
+    result = [(label, sum(1 for _ in group)) for label, group in groups if label]
+    E1 = np.zeros(d)
+    for k in range(1, d+1):
+        e1 = 0
+        for _, n in result:
+            if n >= k:
+                e1 += n+1-k
+        E1[k-1] = e1 * beta_k(d, k)
+    return E1.sum()
+    
