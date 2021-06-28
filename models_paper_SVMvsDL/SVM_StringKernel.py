@@ -49,12 +49,12 @@ print(X_train_seqs_neg.shape)
 print(X_test_seqs_pos.shape)
 print(X_test_seqs_neg.shape)
 
-X_train_seqs_pos = X_train_seqs_pos[::10]
-X_train_seqs_neg = X_train_seqs_neg[::10]
+X_train_seqs_pos = X_train_seqs_pos.reshape((X_train_seqs_pos.shape[0], len(X_train_seqs_pos[0])))[::10]
+X_train_seqs_neg = X_train_seqs_neg.reshape((X_train_seqs_neg.shape[0], len(X_train_seqs_neg[0])))[::10]
 #X_val_seqs_pos = X_val_seqs_pos[::10]
 #X_val_seqs_neg = X_val_seqs_neg[::10]
-X_test_seqs_pos = X_test_seqs_pos[::10]
-X_test_seqs_neg = X_test_seqs_neg[::10]
+X_test_seqs_pos = X_test_seqs_pos.reshape((X_test_seqs_pos.shape[0], len(X_test_seqs_pos[0])))[::10]
+X_test_seqs_neg = X_test_seqs_neg.reshape((X_test_seqs_neg.shape[0], len(X_test_seqs_neg[0])))[::10]
 
 print(X_train_seqs_pos.shape)
 print(X_train_seqs_neg.shape)
