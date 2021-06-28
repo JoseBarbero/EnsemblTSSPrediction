@@ -33,8 +33,10 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     global shared_array
     global n_rows
     global n_cols
-    X1_g = np.array(list(X1))
-    X2_g = np.array(list(X2))
+    X1_g = X1
+    X2_g = X2
+    #X1_g = np.array(list(X1))
+    #X2_g = np.array(list(X2))
     print('X1', X1.shape)
     print('X2', X2.shape)
     d_g = d
@@ -50,7 +52,6 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     # Shared array
     K = np.ctypeslib.as_ctypes(np.zeros((n_rows, n_cols)))      
     shared_array = sharedctypes.RawArray(K._type_, K)
-
     
     print(rows)
     p = Pool()
