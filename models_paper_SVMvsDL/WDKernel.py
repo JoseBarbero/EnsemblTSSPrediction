@@ -46,7 +46,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
 
     # Divide the matrix by rows
     cores = 20
-    block_size = int(n_rows/cores)
+    block_size = 1
     rows = [(startrow, startrow+block_size) if startrow+block_size <= n_rows  else (startrow, n_rows) for startrow in range(0, n_rows, block_size)]
 
     # Shared array
