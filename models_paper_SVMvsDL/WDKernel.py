@@ -117,7 +117,7 @@ def get_K_value(xi, xj, L, d):
     xk = np.array(list(xj))
     groups = groupby(xi == xj) # Para comparar caracter a caracter
     result = [(label, sum(1 for _ in group)) for label, group in groups if label]
-    print(result)
+    print(xi, xj)
     E1 = np.zeros(d)
     for k in range(1, d+1):
         e1 = 0
