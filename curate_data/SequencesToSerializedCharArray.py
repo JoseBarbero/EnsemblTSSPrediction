@@ -6,7 +6,9 @@ import pickle
 
 def sequences_to_char_array(seqs_array):
     # Pasa de un array con cadenas a un array de arrays de caracteres
-    return np.array([np.array(list(seq)) for seq in seqs_array])
+    new = np.array([np.array(list(seq)) for seq in seqs_array])
+    print(seqs_array.shape, new.shape)
+    return new
 
 
 X_train_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_pos.txt')
