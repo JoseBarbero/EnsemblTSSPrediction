@@ -114,10 +114,9 @@ def get_K_value(xi, xj, L, d):
     # Más rápida en cadenas largas. Más lenta en cortas.
     E1 = 0
     xi = np.array(list(xi))
-    xk = np.array(list(xj))
+    xj = np.array(list(xj))
     groups = groupby(xi == xj) # Para comparar caracter a caracter
     result = [(label, sum(1 for _ in group)) for label, group in groups if label]
-    print(xi, xj)
     E1 = np.zeros(d)
     for k in range(1, d+1):
         e1 = 0
