@@ -30,13 +30,26 @@ start = time.time()
 
 
 # Read data
-X_train_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_pos.txt')[::100]
-X_train_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_neg.txt')[::1000]
-#X_val_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_val_TSSseqs_pos.txt')
-#X_val_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_val_TSSseqs_neg.txt')
-X_test_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_pos.txt')[::100]
-X_test_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_neg.txt')[::100]
+X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')[::100]
+X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')[::1000]
+#X_val_seqs_pos_file = open('../data/TSS/seqs/X_val_TSSseqs_pos_chararray.txt', 'rb')
+#X_val_seqs_neg_file = open('../data/TSS/seqs/X_val_TSSseqs_neg_chararray.txt', 'rb')
+X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt', 'rb')[::100]
+X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt', 'rb')[::100]
 
+X_train_seqs_pos = pickle.load(X_train_seqs_pos_file)
+X_train_seqs_neg = pickle.load(X_train_seqs_neg_file)
+#X_val_seqs_pos = pickle.load(X_val_seqs_pos_file)
+#X_val_seqs_neg = pickle.load(X_val_seqs_neg_file)
+X_test_seqs_pos = pickle.load(X_test_seqs_pos_file)
+X_test_seqs_neg = pickle.load(X_test_seqs_neg_file)
+
+X_train_seqs_pos_file.close()
+X_train_seqs_neg_file.close()
+#X_val_file.close()
+#y_val_file.close()
+X_test_seqs_pos_file.close()
+X_test_seqs_neg_file.close()
 
 # Train
 X_train = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
