@@ -1,3 +1,4 @@
+sys.path.append("../utils")
 from ReadData import seqfile_to_instances
 import numpy as np
 import pickle
