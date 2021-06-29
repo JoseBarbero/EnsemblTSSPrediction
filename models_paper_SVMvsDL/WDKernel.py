@@ -9,21 +9,23 @@ def beta_k(d, k):
     # Formula from https://www.jmlr.org/papers/volume7/sonnenburg06a/sonnenburg06a.pdf
     return 2*((d-k+1)/(d*(d+1)))
 
-def fill_per_window(args):
-        inirow, endrow = args
-        tmp = np.ctypeslib.as_array(shared_array)
-        if X1_g is X2_g:
-            print('Son iguales')
-            # Si son iguales solo hace falta recorrer media matriz, la otra mitad tiene los mismos resultados
-            #for idx_x in range(inirow, endrow):
-            #    for idx_y in range(idx_x, n_cols):
-            #        tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
-            #        tmp[idx_y, idx_x] = tmp[idx_x, idx_y]
-        else:
-            print('Son distintas')
-            #for idx_x in range(inirow, endrow):
-            #    for idx_y in range(n_cols):
-            #        tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
+
+def fill_per_window_same_matrix(args):
+    # Si son iguales solo hace falta recorrer media matriz, la otra mitad tiene los mismos resultados
+    inirow, endrow = args
+    tmp = np.ctypeslib.as_array(shared_array)
+    for idx_x in range(inirow, endrow):
+        for idx_y in range(idx_x, n_cols):
+            tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
+            tmp[idx_y, idx_x] = tmp[idx_x, idx_y]
+
+
+def fill_per_window_different_matrix(args):
+    inirow, endrow = args
+    tmp = np.ctypeslib.as_array(shared_array)
+    for idx_x in range(inirow, endrow):
+        for idx_y in range(n_cols):
+            tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
         
                 
 
@@ -51,6 +53,11 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     L = len(X1[0])
     n_rows = X1.shape[0]
     n_cols = X2.shape[0]
+
+    if X1_g is X2_g:
+        fill_per_window = fill_per_window_same_matrix
+    else:
+        fill_per_window = fill_per_window_different_matrix
 
     # Divide the matrix by rows
     cores = 20
