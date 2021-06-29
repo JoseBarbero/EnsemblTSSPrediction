@@ -53,7 +53,7 @@ def parallel_wdkernel_gram_matrix(X1, X2):
     K = np.ctypeslib.as_ctypes(np.zeros((n_rows, n_cols)))      
     shared_array = sharedctypes.RawArray(K._type_, K)
     
-    print(rows)
+    #print(rows)
     p = Pool()
     res = p.map(fill_per_window, rows)
     result = np.ctypeslib.as_array(shared_array)
@@ -107,6 +107,7 @@ def old_get_K_value(xi, xj, L, d):
             E2 += int(xi[l:l+k] == xj[l:l+k])
         E1 += beta * E2
     return E1
+
 
 def get_K_value(xi, xj, L, d):
     # Versión optimizada (mucho menos legible)
