@@ -12,11 +12,19 @@ def beta_k(d, k):
 def fill_per_window(args):
         inirow, endrow = args
         tmp = np.ctypeslib.as_array(shared_array)
-
-        for idx_x in range(inirow, endrow):
-            for idx_y in range(idx_x, n_cols):
-                tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
-                tmp[idx_y, idx_x] = tmp[idx_x, idx_y]
+        if X1_g == X2_g:
+            print('Son iguales')
+            # Si son iguales solo hace falta recorrer media matriz, la otra mitad tiene los mismos resultados
+            #for idx_x in range(inirow, endrow):
+            #    for idx_y in range(idx_x, n_cols):
+            #        tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
+            #        tmp[idx_y, idx_x] = tmp[idx_x, idx_y]
+        else:
+            print('Son distintas')
+            #for idx_x in range(inirow, endrow):
+            #    for idx_y in range(n_cols):
+            #        tmp[idx_x, idx_y] = get_K_value(X1_g[idx_x], X2_g[idx_y], L, d_g)
+        
                 
 
 def parallel_wdkernel_gram_matrix(X1, X2):
