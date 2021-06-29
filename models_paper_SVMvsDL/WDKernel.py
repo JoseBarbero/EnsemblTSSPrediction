@@ -12,7 +12,7 @@ def beta_k(d, k):
 def fill_per_window(args):
         inirow, endrow = args
         tmp = np.ctypeslib.as_array(shared_array)
-        if X1_g == X2_g:
+        if X1_g is X2_g:
             print('Son iguales')
             # Si son iguales solo hace falta recorrer media matriz, la otra mitad tiene los mismos resultados
             #for idx_x in range(inirow, endrow):
