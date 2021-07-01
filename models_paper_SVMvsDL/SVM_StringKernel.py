@@ -44,12 +44,12 @@ X_train_seqs_neg = pickle.load(X_train_seqs_neg_file)
 X_test_seqs_pos = pickle.load(X_test_seqs_pos_file)
 X_test_seqs_neg = pickle.load(X_test_seqs_neg_file)
 
-X_train_seqs_pos = X_train_seqs_pos[::10]
-X_train_seqs_neg = X_train_seqs_neg[::10]
+X_train_seqs_pos = X_train_seqs_pos #[::10]
+X_train_seqs_neg = X_train_seqs_neg #[::10]
 #X_val_seqs_pos = X_val_seqs_pos[::10]
 #X_val_seqs_neg = X_val_seqs_neg[::10]
-X_test_seqs_pos = X_test_seqs_pos[::10]
-X_test_seqs_neg = X_test_seqs_neg[::10]
+X_test_seqs_pos = X_test_seqs_pos #[::10]
+X_test_seqs_neg = X_test_seqs_neg #[::10]
 
 X_train_seqs_pos_file.close()
 X_train_seqs_neg_file.close()
