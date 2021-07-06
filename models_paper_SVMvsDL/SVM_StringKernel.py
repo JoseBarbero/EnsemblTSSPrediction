@@ -48,8 +48,8 @@ X_train_seqs_pos = X_train_seqs_pos[::2]
 X_train_seqs_neg = X_train_seqs_neg[::2]
 #X_val_seqs_pos = X_val_seqs_pos[::10]
 #X_val_seqs_neg = X_val_seqs_neg[::10]
-X_test_seqs_pos = X_test_seqs_pos[::2]
-X_test_seqs_neg = X_test_seqs_neg[::2]
+X_test_seqs_pos = X_test_seqs_pos[::10]
+X_test_seqs_neg = X_test_seqs_neg[::10]
 
 X_train_seqs_pos_file.close()
 X_train_seqs_neg_file.close()
