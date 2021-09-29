@@ -18,9 +18,8 @@ from keras.callbacks import LearningRateScheduler
 def mlp():
     model = Sequential()
 
-    model.add(Dense(1024, activation = 'relu', input_shape=(1003, 4)))
-    model.add(Dense(1024, activation = 'relu'))
-    model.add(Dense(1024, activation = 'relu'))
+    model.add(Dense(4096, activation = 'relu', input_shape=(1003, 4)))
+    model.add(Dense(512, activation = 'relu'))
 
     model.add(Flatten())
 
@@ -204,13 +203,13 @@ if __name__ == "__main__":
         y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
 
         X_train = pickle.load(X_train_file)
-        X_train = X_train[::2]
+        X_train = X_train
         y_train = pickle.load(y_train_file)
-        y_train = y_train[::2]
+        y_train = y_train
         X_val = pickle.load(X_val_file)
-        X_val = X_val[::2]
+        X_val = X_val
         y_val = pickle.load(y_val_file)
-        y_val = y_val[::2]
+        y_val = y_val
         X_test = pickle.load(X_test_file)
         y_test = pickle.load(y_test_file)
 
