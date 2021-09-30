@@ -1,2 +1,2 @@
 # EnsemblTISPrediction
-TIS Prediction with Ensembl data.
+TSS Prediction with Ensembl data.
