@@ -1,6 +1,6 @@
 import sys
 
-def seq2kmer(seq, k):
+def seq2kmer(seq, k, maxlength=512):
     """
     Convert original sequence to kmers
     
@@ -12,6 +12,15 @@ def seq2kmer(seq, k):
     kmers -- str, kmers separated by space
 
     """
+    if len(seq) > 512:
+        
+        middle_idx = int((len(seq) - 1)/2)
+        start_idx = middle_idx-256
+        end_idx = middle_idx+256
+        seq = seq[start_idx:end_idx]
+
+    print(f"Sequence trimmed to length: {maxlength}")
+
     kmer = [seq[x:x+k] for x in range(len(seq)+1-k)]
     kmers = " ".join(kmer)
     return kmers
