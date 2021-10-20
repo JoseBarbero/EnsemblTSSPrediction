@@ -197,7 +197,9 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
 
 if __name__ == "__main__":
-    with tf.device('/device:GPU:2'):
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2"])
+    #with tf.device('/device:GPU:0'):
+    with strategy.scope():
         seed = 42
         np.random.seed(seed)
 
