@@ -18,8 +18,8 @@ from keras.callbacks import LearningRateScheduler
 def bilstm_att():
     sequence_input = tf.keras.layers.Input(shape=(1003,4))
 
-    x = tf.keras.layers.MultiHeadAttention(num_heads=3, key_dim=1, attention_axes=(1))(sequence_input, sequence_input)
-    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64, return_sequences=True, dropout=0.75,))(x)
+    x = tf.keras.layers.MultiHeadAttention(num_heads=2, key_dim=2)(sequence_input, sequence_input)
+    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64, return_sequences=True, dropout=0.25,))(x)
     x = tf.keras.layers.Flatten()(x)
     x = tf.keras.layers.Dense(units=64, activation='relu')(x)
     x = tf.keras.layers.Dropout(0.75)(x)
