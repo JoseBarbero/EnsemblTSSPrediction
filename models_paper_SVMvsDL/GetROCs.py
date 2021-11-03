@@ -41,10 +41,10 @@ y_test_file.close()
 
 
 # Read data
-X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')
-X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')
-X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt', 'rb')
-X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt', 'rb')
+X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos.txt', 'rb')
+X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg.txt', 'rb')
+X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos.txt', 'rb')
+X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg.txt', 'rb')
 X_train_seqs_pos = pickle.load(X_train_seqs_pos_file)
 X_train_seqs_neg = pickle.load(X_train_seqs_neg_file)
 X_test_seqs_pos = pickle.load(X_test_seqs_pos_file)
