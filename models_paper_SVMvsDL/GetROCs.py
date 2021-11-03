@@ -38,6 +38,8 @@ auc_lstmcnn = metrics.roc_auc_score(y_test, y_pred_lstmcnn)
 auc_bilstmcnn = metrics.roc_auc_score(y_test, y_pred_bilstmcnn)
 #auc_svm = metrics.roc_auc_score(y_test, y_pred_svm)
 
+plt.figure(figsize=(8, 6))
+
 plt.plot(fpr_cnn, tpr_cnn, label="cnn, auc="+str(round(auc_cnn, 3)))
 plt.plot(fpr_lstm, tpr_lstm, label="lstm, auc="+str(round(auc_lstm, 3)))
 plt.plot(fpr_bilstm, tpr_bilstm, label="bilstm, auc="+str(round(auc_bilstm, 3)))
@@ -45,7 +47,7 @@ plt.plot(fpr_lstmcnn, tpr_lstmcnn, label="lstmcnn, auc="+str(round(auc_lstmcnn, 
 plt.plot(fpr_bilstmcnn, tpr_bilstmcnn, label="bilstmcnn, auc="+str(round(auc_bilstmcnn, 3)))
 #plt.plot(fpr_svm, tpr_svm, label="svm, auc="+str(round(auc_svm, 3)))
 
-plt.figure(figsize=(8, 6))
+
 plt.legend(loc=4, fontsize=12)
 plt.show()
 plt.savefig('rocs.png')
