@@ -38,7 +38,7 @@ auc_lstmcnn = metrics.roc_auc_score(y_test, y_pred_lstmcnn)
 auc_bilstmcnn = metrics.roc_auc_score(y_test, y_pred_bilstmcnn)
 #auc_svm = metrics.roc_auc_score(y_test, y_pred_svm)
 
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(9, 5))
 
 plt.plot(fpr_cnn, tpr_cnn, label="cnn, auc="+str(round(auc_cnn, 3)))
 plt.plot(fpr_lstm, tpr_lstm, label="lstm, auc="+str(round(auc_lstm, 3)))
