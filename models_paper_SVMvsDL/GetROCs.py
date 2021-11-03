@@ -45,6 +45,7 @@ plt.plot(fpr_lstmcnn, tpr_lstmcnn, label="lstmcnn, auc="+str(round(auc_lstmcnn, 
 plt.plot(fpr_bilstmcnn, tpr_bilstmcnn, label="bilstmcnn, auc="+str(round(auc_bilstmcnn, 3)))
 #plt.plot(fpr_svm, tpr_svm, label="svm, auc="+str(round(auc_svm, 3)))
 
+plt.figure(figsize=(8, 6))
 plt.legend(loc=4, fontsize=12)
 plt.show()
 plt.savefig('rocs.png')
