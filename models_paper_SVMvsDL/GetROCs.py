@@ -10,7 +10,7 @@ lstm = load_model('logs/100%data/lstm/lstm_100%data_run1.h5')
 bilstm = load_model('logs/100%data/bilstm/bilstm_100%data_run1.h5')
 lstmcnn = load_model('logs/100%data/lstmcnn/lstmcnn_100%data_run1.h5')
 bilstmcnn = load_model('logs/100%data/bilstmcnn/bilstmcnn_100%data_run1.h5')
-svm = pickle.load(open('logs/svm_50pc.pkl', 'rb'))
+svm = pickle.load(open('logs/svm_test.pkl', 'rb'))
 
 X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
 y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
