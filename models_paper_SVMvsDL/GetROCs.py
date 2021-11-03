@@ -24,14 +24,14 @@ y_test_file.close()
 # y_pred_bilstm = bilstm.predict(X_test).ravel()
 # y_pred_lstmcnn = lstmcnn.predict(X_test).ravel()
 # y_pred_bilstmcnn = bilstmcnn.predict(X_test).ravel()
-y_pred_svm = svm.predict(X_test)
+
 
 # fpr_cnn, tpr_cnn, _ = metrics.roc_curve(y_test,  y_pred_cnn)
 # fpr_lstm, tpr_lstm, _ = metrics.roc_curve(y_test,  y_pred_lstm)
 # fpr_bilstm, tpr_bilstm, _ = metrics.roc_curve(y_test,  y_pred_bilstm)
 # fpr_lstmcnn, tpr_lstmcnn, _ = metrics.roc_curve(y_test,  y_pred_lstmcnn)
 # fpr_bilstmcnn, tpr_bilstmcnn, _ = metrics.roc_curve(y_test,  y_pred_bilstmcnn)
-fpr_svm, tpr_svm, _ = metrics.roc_curve(y_test,  y_pred_svm)
+
 
 # auc_cnn = metrics.roc_auc_score(y_test, y_pred_cnn)
 # auc_lstm = metrics.roc_auc_score(y_test, y_pred_lstm)
@@ -43,39 +43,32 @@ fpr_svm, tpr_svm, _ = metrics.roc_curve(y_test,  y_pred_svm)
 # Read data
 X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')
 X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')
-#X_val_seqs_pos_file = open('../data/TSS/seqs/X_val_TSSseqs_pos_chararray.txt', 'rb')
-#X_val_seqs_neg_file = open('../data/TSS/seqs/X_val_TSSseqs_neg_chararray.txt', 'rb')
 X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt', 'rb')
 X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt', 'rb')
-
 X_train_seqs_pos = pickle.load(X_train_seqs_pos_file)
 X_train_seqs_neg = pickle.load(X_train_seqs_neg_file)
-#X_val_seqs_pos = pickle.load(X_val_seqs_pos_file)
-#X_val_seqs_neg = pickle.load(X_val_seqs_neg_file)
 X_test_seqs_pos = pickle.load(X_test_seqs_pos_file)
 X_test_seqs_neg = pickle.load(X_test_seqs_neg_file)
-
 X_train_seqs_pos = X_train_seqs_pos[::1000]
 X_train_seqs_neg = X_train_seqs_neg[::1000]
-#X_val_seqs_pos = X_val_seqs_pos[::10]
-#X_val_seqs_neg = X_val_seqs_neg[::10]
 X_test_seqs_pos = X_test_seqs_pos[::1000]
 X_test_seqs_neg = X_test_seqs_neg[::1000]
-
 X_train_seqs_pos_file.close()
 X_train_seqs_neg_file.close()
-#X_val_file.close()
-#y_val_file.close()
 X_test_seqs_pos_file.close()
 X_test_seqs_neg_file.close()
-
 # Train
 X_train = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
 y_train = np.concatenate([np.ones(len(X_train_seqs_pos), dtype=int), np.zeros(len(X_train_seqs_neg), dtype=int)])
-print('X_train shape:', X_train.shape)
-X_train_gram = parallel_wdkernel_gram_matrix(X_train, X_train)
-
+# Test
+X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
+y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
+print('X_test shape:', X_test.shape)
+X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train)
+# Prediction
+y_pred_svm = svm.predict(X_test_gram)
 auc_svm = metrics.roc_auc_score(y_test, y_pred_svm)
+fpr_svm, tpr_svm, _ = metrics.roc_curve(y_test,  y_pred_svm)
 
 # plt.plot(fpr_cnn, tpr_cnn, label="cnn, auc="+str(round(auc_cnn, 3)))
 # plt.plot(fpr_lstm, tpr_lstm, label="lstm, auc="+str(round(auc_lstm, 3)))
