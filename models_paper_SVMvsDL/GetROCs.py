@@ -1,6 +1,7 @@
-from sklearn.metrics import roc_curve
 from keras.models import load_model
+from sklearn import metrics
 import pickle
+import matplotlib.pyplot as plt
 
 cnn = load_model('logs/100%data/cnn/cnn_100%data_run1.h5')
 lstm = load_model('logs/100%data/lstm/lstm_100%data_run1.h5')
@@ -16,5 +17,10 @@ y_test = pickle.load(y_test_file)
 X_test_file.close()
 y_test_file.close()
 
-y_pred_keras = cnn.predict(X_test).ravel()
-fpr_keras, tpr_keras, thresholds_keras = roc_curve(y_test, y_pred_keras)
+y_pred_cnn = cnn.predict(X_test).ravel()
+
+fpr, tpr, _ = metrics.roc_curve(y_test,  y_pred_cnn)
+auc = metrics.roc_auc_score(y_test, y_pred_cnn)
+plt.plot(fpr,tpr,label="data 1, auc="+str(auc))
+plt.legend(loc=4)
+plt.show()
