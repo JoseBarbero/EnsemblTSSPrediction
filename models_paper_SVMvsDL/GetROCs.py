@@ -2,6 +2,8 @@ from keras.models import load_model
 from sklearn import metrics
 import pickle
 import matplotlib.pyplot as plt
+from WDKernel import parallel_wdkernel_gram_matrix
+import numpy as np
 
 cnn = load_model('logs/100%data/cnn/cnn_100%data_run1.h5')
 lstm = load_model('logs/100%data/lstm/lstm_100%data_run1.h5')
@@ -36,6 +38,43 @@ fpr_svm, tpr_svm, _ = metrics.roc_curve(y_test,  y_pred_svm)
 # auc_bilstm = metrics.roc_auc_score(y_test, y_pred_bilstm)
 # auc_lstmcnn = metrics.roc_auc_score(y_test, y_pred_lstmcnn)
 # auc_bilstmcnn = metrics.roc_auc_score(y_test, y_pred_bilstmcnn)
+
+
+# Read data
+X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')
+X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')
+#X_val_seqs_pos_file = open('../data/TSS/seqs/X_val_TSSseqs_pos_chararray.txt', 'rb')
+#X_val_seqs_neg_file = open('../data/TSS/seqs/X_val_TSSseqs_neg_chararray.txt', 'rb')
+X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt', 'rb')
+X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt', 'rb')
+
+X_train_seqs_pos = pickle.load(X_train_seqs_pos_file)
+X_train_seqs_neg = pickle.load(X_train_seqs_neg_file)
+#X_val_seqs_pos = pickle.load(X_val_seqs_pos_file)
+#X_val_seqs_neg = pickle.load(X_val_seqs_neg_file)
+X_test_seqs_pos = pickle.load(X_test_seqs_pos_file)
+X_test_seqs_neg = pickle.load(X_test_seqs_neg_file)
+
+X_train_seqs_pos = X_train_seqs_pos[::1000]
+X_train_seqs_neg = X_train_seqs_neg[::1000]
+#X_val_seqs_pos = X_val_seqs_pos[::10]
+#X_val_seqs_neg = X_val_seqs_neg[::10]
+X_test_seqs_pos = X_test_seqs_pos[::1000]
+X_test_seqs_neg = X_test_seqs_neg[::1000]
+
+X_train_seqs_pos_file.close()
+X_train_seqs_neg_file.close()
+#X_val_file.close()
+#y_val_file.close()
+X_test_seqs_pos_file.close()
+X_test_seqs_neg_file.close()
+
+# Train
+X_train = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
+y_train = np.concatenate([np.ones(len(X_train_seqs_pos), dtype=int), np.zeros(len(X_train_seqs_neg), dtype=int)])
+print('X_train shape:', X_train.shape)
+X_train_gram = parallel_wdkernel_gram_matrix(X_train, X_train)
+
 auc_svm = metrics.roc_auc_score(y_test, y_pred_svm)
 
 # plt.plot(fpr_cnn, tpr_cnn, label="cnn, auc="+str(round(auc_cnn, 3)))
