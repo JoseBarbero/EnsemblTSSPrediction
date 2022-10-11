@@ -3,6 +3,11 @@ CFLAGS=-fPIC -shared
 OBJECTS=strkernel.so
 .PHONY: wdkernel
 .PHONY: strkernel
+.PHONY: lib
+
+lib: strkernel.c
+	@echo Compiling shared library
+	$(CC) $(CFLAGS) strkernel.c -o strkernel.so
 
 wdkernel: strkernel.so
 	@echo "\nTesting the performance of WD kernel calculation"

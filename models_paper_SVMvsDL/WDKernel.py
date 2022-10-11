@@ -33,7 +33,7 @@ except Exception:
     print(f"{RED}Compile it first with:{END}")
     print(f"{GREEN}   gcc -fPIC -shared strkernel.c -o strkernel.so{END}")
     print("or:")
-    print(f"{GREEN}   make strkernel{END}")
+    print(f"{GREEN}   make lib{END}")
     sys.exit(-1)
 
 charptr = ct.POINTER(ct.c_char)
