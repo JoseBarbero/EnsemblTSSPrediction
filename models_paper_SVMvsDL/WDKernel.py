@@ -31,7 +31,7 @@ try:
 except Exception:
     print(f"{RED}Library strkernel.so not found.{END}")
     print(f"{RED}Compile it first with:{END}")
-    print(f"{GREEN}   gcc -fPIC -shared strkernel.c -o strkernel.so{END}")
+    print(f"{GREEN}   gcc -O2 -fPIC -shared strkernel.c -o strkernel.so{END}")
     print("or:")
     print(f"{GREEN}   make lib{END}")
     sys.exit(-1)

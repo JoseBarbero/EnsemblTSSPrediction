@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-fPIC -shared
+CFLAGS=-O2 -fPIC -shared
 OBJECTS=strkernel.so
 .PHONY: wdkernel
 .PHONY: strkernel
@@ -15,7 +15,7 @@ wdkernel: strkernel.so
 
 strkernel:
 	@echo "\nTesting the performance of string kernel in C"
-	gcc strkernel.c
+	gcc -O2 strkernel.c
 	mv a.out ~
 	chmod +x ~/a.out
 	~/a.out
