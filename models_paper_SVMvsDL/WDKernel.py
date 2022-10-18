@@ -31,7 +31,7 @@ try:
 except Exception:
     print(f"{RED}Library strkernel.so not found.{END}")
     print(f"{RED}Compile it first with:{END}")
-    print(f"{GREEN}   gcc -fPIC -shared strkernel.c -o strkernel.so{END}")
+    print(f"{GREEN}   gcc -O2 -fPIC -shared strkernel.c -o strkernel.so{END}")
     print("or:")
     print(f"{GREEN}   make lib{END}")
     sys.exit(-1)
@@ -165,7 +165,7 @@ def fill_per_window_different_matrix(args):
 
 
 def parallel_wdkernel_gram_matrix(X1, X2, ncores=20, d=10):
-    # https://jonasteuwen.github.io/numpy/python/multiprocessing/2017/01/07/multiprocessing-numpy-array.html
+    # https://web.archive.org/web/20201211130940/https://jonasteuwen.github.io/numpy/python/multiprocessing/2017/01/07/multiprocessing-numpy-array.html
 
     # Needed for multiprocessing
     global X1_g
@@ -193,8 +193,7 @@ def parallel_wdkernel_gram_matrix(X1, X2, ncores=20, d=10):
         fill_per_window = fill_per_window_different_matrix
 
     # Divide the matrix by rows
-    cores = ncores
-    block_size = int(n_rows/cores) + 1
+    block_size = int(n_rows/ncores) + 1
     rows = [(startrow, startrow+block_size)
             if startrow+block_size <= n_rows else
             (startrow, n_rows)
@@ -234,8 +233,7 @@ def parallel_wdkernel_gram_matrix_with_cgo_get_K_value_version1(X1, X2, ncores=2
         fill_per_window = fill_per_window_same_matrix_with_cgo_get_K_value_version1
     else:
         fill_per_window = fill_per_window_different_matrix
-    cores = ncores
-    block_size = int(n_rows/cores) + 1
+    block_size = int(n_rows/ncores) + 1
     rows = [(startrow, startrow+block_size)
             if startrow+block_size <= n_rows else
             (startrow, n_rows)

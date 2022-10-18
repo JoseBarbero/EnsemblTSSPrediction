@@ -20,13 +20,13 @@
 // first and later encoded, what adds an unnecessary overhead to the process.
 long double cgo_get_K_value1(char *xi, char *xj, int L, int d)
 {
-    long double E1, beta;
-    int E2;
-    int k, l, j, eq;
+    long double E1;
+    unsigned int E2;
+    register int k, l, j;
+    unsigned int eq;
     E1 = 0.0L;
     for (k=1; k<d+1; k++)
     {
-        beta = BETA_K(d, k);
         E2 = 0;
         for (l=0; l<L-k+1; l++)
         {
@@ -41,7 +41,7 @@ long double cgo_get_K_value1(char *xi, char *xj, int L, int d)
             }
             E2 += eq;
         }
-        E1 += beta*E2;
+        E1 += BETA_K(d, k)*E2;
     }
     return E1;
 }
@@ -52,15 +52,14 @@ long double cgo_get_K_value1(char *xi, char *xj, int L, int d)
 // Still with the problem of numpy rows conversion.
 long double cgo_get_K_value2(char *xi, char *xj, int L, int d)
 {
-    long double E1, beta;
-    int E2;
-    int k, l, j;
+    long double E1;
+    unsigned int E2;
+    register unsigned int k, l, j;
     char *xi_iniseq, *xj_iniseq;
     char *xi_currpos, *xj_currpos;
     E1 = 0.0L;
     for (k=1; k<d+1; k++)
     {
-        beta = BETA_K(d, k);
         E2 = 0;
         for (l=0, xi_iniseq=xi, xj_iniseq=xj; l<L-k+1; l++, xi_iniseq++, xj_iniseq++)
         {
@@ -72,7 +71,7 @@ long double cgo_get_K_value2(char *xi, char *xj, int L, int d)
                 E2++;
             }
         }
-        E1 += beta*E2;
+        E1 += BETA_K(d, k)*E2;
     }
     return E1;
 }
@@ -80,13 +79,19 @@ long double cgo_get_K_value2(char *xi, char *xj, int L, int d)
 // This is the fastest version when called from Python. Now the numpy array
 // rows can be directly passed avoiding the overhead of transforming them to
 // string and encoding them afterwards.
-long double cgo_get_K_value3(const wchar_t *xi, const wchar_t *xj, int L, int
-        d) { long double E1, beta; int E2; int k, l, j, eq;
+long double cgo_get_K_value3(const wchar_t *xi,
+                             const wchar_t *xj,
+                             int L,
+                             int d)
+{
+    long double E1;
+    register unsigned int k, l, j;
+    unsigned char eq;
+    unsigned int E2;
 
     E1 = 0.0L;
     for (k=1; k<d+1; k++)
     {
-        beta = BETA_K(d, k);
         E2 = 0;
         for (l=0; l<L-k+1; l++)
         {
@@ -101,7 +106,7 @@ long double cgo_get_K_value3(const wchar_t *xi, const wchar_t *xj, int L, int
             }
             E2 += eq;
         }
-        E1 += beta*E2;
+        E1 += BETA_K(d, k)*E2;
     }
     return E1;
 }
