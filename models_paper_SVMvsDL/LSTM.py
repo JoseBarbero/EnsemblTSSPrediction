@@ -4,6 +4,7 @@ import numpy as np
 import re
 import os
 import pickle
+import time
 from Results import test_results, plot_train_history, recall_m, precision_m, f1_m
 from datetime import datetime
 from contextlib import redirect_stdout
@@ -32,7 +33,6 @@ def lstm():
 
 def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_test, global_y_train, global_y_val, global_y_test, run_id):
 
-    
     accuracy_train = np.zeros(5)
     binarycrossentropy_train = np.zeros(5)
     f1_train = np.zeros(5)
@@ -286,8 +286,12 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
 
 if __name__ == "__main__":
-    seed = 42
-    np.random.seed(seed)
+    #seed = 42
+    #np.random.seed(seed)
+    #tf.random.set_seed(42)
+
+    # Time
+    start = time.time()
 
     X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
     y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
@@ -316,5 +320,8 @@ if __name__ == "__main__":
         run_id = sys.argv[1]
         #run_id = "".join(categories)
 
-    #single_train(lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    k_train(lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    single_train(lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #k_train(lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+
+    # Time formatted in days, hours, minutes and seconds
+    print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")

@@ -4,6 +4,7 @@ import numpy as np
 import re
 import os
 import pickle
+import time
 from Results import test_results, plot_train_history, recall_m, precision_m, f1_m
 from datetime import datetime
 from contextlib import redirect_stdout
@@ -280,8 +281,12 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
 
 if __name__ == "__main__":
-    seed = 42
-    np.random.seed(seed)
+    #seed = 42
+    #np.random.seed(seed)
+    #tf.random.set_seed(42)
+
+    # Time
+    start = time.time()
 
     X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
     y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
@@ -313,5 +318,8 @@ if __name__ == "__main__":
     else:
         run_id = sys.argv[1]
     
-    #single_train(cnn_blstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    k_train(cnn_blstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    single_train(cnn_blstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #k_train(cnn_blstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+
+    # Time formatted in days, hours, minutes and seconds
+    print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")

@@ -4,6 +4,7 @@ import numpy as np
 import re
 import os
 import pickle
+import time
 from Results import test_results, plot_train_history, recall_m, precision_m, f1_m
 from datetime import datetime
 from contextlib import redirect_stdout
@@ -281,12 +282,16 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
 
     model.save(model_file)
-    plot_train_history(history.history, plot_file)
+    #plot_train_history(history.history, plot_file)
 
 
 if __name__ == "__main__":
-    seed = 42
-    np.random.seed(seed)
+    #seed = 42
+    #np.random.seed(seed)
+    #tf.random.set_seed(42)
+
+    # Time
+    start = time.time()
 
     X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
     y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
@@ -319,5 +324,8 @@ if __name__ == "__main__":
         run_id = sys.argv[1]
         #run_id = "".join(categories)
 
-    #single_train(bilstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    k_train(bilstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    single_train(bilstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #k_train(bilstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+
+    # Time formatted in days, hours, minutes and seconds
+    print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")

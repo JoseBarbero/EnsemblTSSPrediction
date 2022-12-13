@@ -28,7 +28,7 @@ def bilstm_att():
     output = tf.keras.layers.Activation('sigmoid')(output)
 
     model = tf.keras.Model(inputs=sequence_input, outputs=output)
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", f1_m, 'AUC'])
 
     return model
 
@@ -234,5 +234,5 @@ if __name__ == "__main__":
             run_id = sys.argv[1]
             #run_id = "".join(categories)
 
-        single_train(bilstm_att(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-        #k_train(bilstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+        #single_train(bilstm_att(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+        k_train(bilstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
