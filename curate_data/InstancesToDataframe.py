@@ -35,3 +35,4 @@ for record in ensembl_data:
 
 
 ensembl_df.to_csv(DATAFRAME_OUT_FILE)
+

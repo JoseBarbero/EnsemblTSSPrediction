@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-
+from keras import backend as K
 
 def plot_train_history(history, imgname):    
     
@@ -34,11 +34,30 @@ def plot_train_history(history, imgname):
 
 
 def test_results(X_test, y_test, model):
-    test_bc, test_acc, test_auc = model.evaluate(X_test, y_test, verbose=False)
+    test_bc, test_acc, test_f1, test_auc = model.evaluate(X_test, y_test, verbose=False)
 
     print(f"\tAccuracy score:  {test_acc}")
     print()
     print(f"\tBinary crossentropy : {test_bc}")
     print()
+    print(f"\tF1 score : {test_f1}")
+    print()
     print(f"\tAUC ROC: {test_auc}")
     print()
+
+def recall_m(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    recall = true_positives / (possible_positives + K.epsilon())
+    return recall
+
+def precision_m(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+    precision = true_positives / (predicted_positives + K.epsilon())
+    return precision
+
+def f1_m(y_true, y_pred):
+    precision = precision_m(y_true, y_pred)
+    recall = recall_m(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))

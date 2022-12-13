@@ -4,16 +4,15 @@ import numpy as np
 import re
 import os
 import pickle
-from Results import test_results, plot_train_history
+from Results import test_results, plot_train_history, recall_m, precision_m, f1_m
 from datetime import datetime
 from contextlib import redirect_stdout
-import keras
 import tensorflow as tf
-from keras import layers
-from keras.models import Sequential
-from keras.layers import Conv1D, Conv2D, Conv3D, Dropout, MaxPooling1D, MaxPooling2D, Flatten, Dense
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from keras.callbacks import LearningRateScheduler
+from tensorflow.keras import layers
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv1D, Conv2D, Conv3D, Dropout, MaxPooling1D, MaxPooling2D, Flatten, Dense
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.callbacks import LearningRateScheduler
 
 def lstm():
     sequence_input = tf.keras.layers.Input(shape=(1003,4))
@@ -27,33 +26,66 @@ def lstm():
     output = tf.keras.layers.Activation('sigmoid')(output)
 
     model = tf.keras.Model(inputs=sequence_input, outputs=output)
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", 'AUC'])
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", f1_m, 'AUC'])
 
     return model
 
-def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
+def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_test, global_y_train, global_y_val, global_y_test, run_id):
 
     
     accuracy_train = np.zeros(5)
     binarycrossentropy_train = np.zeros(5)
+    f1_train = np.zeros(5)
     auc_train = np.zeros(5)
 
     accuracy_val = np.zeros(5)
     binarycrossentropy_val = np.zeros(5)
+    f1_val = np.zeros(5)
     auc_val = np.zeros(5)
 
     accuracy_test = np.zeros(5)
     binarycrossentropy_test = np.zeros(5)
+    f1_test = np.zeros(5)
     auc_test = np.zeros(5)
 
     summary_file = "logs/"+run_id+".log"
 
-    for k in range(n_folds):
+    # Shuffle X_train and y_train keeping the same order
+    shuffled_X_train_idx = np.random.permutation(len(global_X_train))
+    global_X_train = global_X_train[shuffled_X_train_idx]
+    global_y_train = global_y_train[shuffled_X_train_idx]
 
-        log_file = "logs/"+run_id+str(k)+".log"
-        hist_file = "logs/"+run_id+str(k)+".pkl"
-        plot_file = "logs/"+run_id+str(k)+".png"
-        model_file = "logs/"+run_id+str(k)+".h5"
+    shuffled_X_val_idx = np.random.permutation(len(global_X_val))
+    global_X_val = global_X_val[shuffled_X_val_idx]
+    global_y_val = global_y_val[shuffled_X_val_idx]
+
+    # Split data in 5 groups for cross validation
+    X_train_splits = np.array_split(global_X_train, n_folds)
+    y_train_splits = np.array_split(global_y_train, n_folds)
+
+    X_val_splits = np.array_split(global_X_val, n_folds)
+    y_val_splits = np.array_split(global_y_val, n_folds)
+
+    for k in range(n_folds):
+        
+        X_train = X_train_splits[k]
+        y_train = y_train_splits[k]
+        X_val = X_val_splits[k]
+        y_val = y_val_splits[k]
+        X_test = global_X_test
+        y_test = global_y_test
+
+        log_file = "logs/"+run_id+"_"+str(k+1)+"_fold.log"
+        hist_file = "logs/"+run_id+"_"+str(k+1)+"_fold.pkl"
+        plot_file = "logs/"+run_id+"_"+str(k+1)+"_fold.png"
+        model_file = "logs/"+run_id+"_"+str(k+1)+"_fold.h5"
+        X_train_file = "logs/"+run_id+"_"+str(k+1)+"_fold_X_train.pkl"
+        X_val_file = "logs/"+run_id+"_"+str(k+1)+"_fold_X_val.pkl"
+        X_test_file = "logs/"+run_id+"_"+str(k+1)+"_fold_X_test.pkl"
+        y_train_file = "logs/"+run_id+"_"+str(k+1)+"_fold_y_train.pkl"
+        y_val_file = "logs/"+run_id+"_"+str(k+1)+"_fold_y_val.pkl"
+        y_test_file = "logs/"+run_id+"_"+str(k+1)+"_fold_y_test.pkl"
+        y_pred_file = "logs/"+run_id+"_"+str(k+1)+"_fold_y_pred.pkl"
 
         logdir = os.path.dirname(log_file)
         if not os.path.exists(logdir):
@@ -91,13 +123,34 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
                 test_results(X_test, y_test, model)
 
                 with open(hist_file, 'wb') as file_pi:
-                    pickle.dump(history.history, file_pi)
+                    pickle.dump(history.history, file_pi, protocol=4)
+
+                with open(X_train_file, 'wb') as file_pi:
+                    pickle.dump(X_train, file_pi, protocol=4)
+                
+                with open(X_val_file, 'wb') as file_pi:
+                    pickle.dump(X_val, file_pi, protocol=4)
+                
+                with open(X_test_file, 'wb') as file_pi:
+                    pickle.dump(X_test, file_pi, protocol=4)
+                
+                with open(y_train_file, 'wb') as file_pi:
+                    pickle.dump(y_train, file_pi, protocol=4)
+                
+                with open(y_val_file, 'wb') as file_pi:
+                    pickle.dump(y_val, file_pi, protocol=4)
+                
+                with open(y_test_file, 'wb') as file_pi:
+                    pickle.dump(y_test, file_pi, protocol=4)
+                
+                with open(y_pred_file, 'wb') as file_pi:
+                    pickle.dump(model.predict(X_test), file_pi, protocol=4)
 
                 # plot_train_history(history.history, plot_file)
         
-        binarycrossentropy_train[k], accuracy_train[k], auc_train[k] = model.evaluate(X_train, y_train, verbose=False)
-        binarycrossentropy_val[k], accuracy_val[k], auc_val[k] = model.evaluate(X_val, y_val, verbose=False)
-        binarycrossentropy_test[k], accuracy_test[k], auc_test[k] = model.evaluate(X_test, y_test, verbose=False)
+        binarycrossentropy_train[k], accuracy_train[k], f1_train[k], auc_train[k] = model.evaluate(X_train, y_train, verbose=False)
+        binarycrossentropy_val[k], accuracy_val[k], f1_train[k], auc_val[k] = model.evaluate(X_val, y_val, verbose=False)
+        binarycrossentropy_test[k], accuracy_test[k], f1_train[k], auc_test[k] = model.evaluate(X_test, y_test, verbose=False)
 
         with open(hist_file, 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
@@ -105,46 +158,83 @@ def k_train(model_definition, n_folds, X_train, X_val, X_test, y_train, y_val, y
         model.save(model_file)
     
 
-    with open(summary_file, 'w') as summary_f:
-        summary_f.write('accuracy_train: ')
-        np.savetxt(summary_f, accuracy_train)
-        summary_f.write('accuracy_val: ')
-        np.savetxt(summary_f, accuracy_val)
-        summary_f.write('accuracy_test: ')
-        np.savetxt(summary_f, accuracy_test)
-        summary_f.write('binarycrossentropy_train: ')
-        np.savetxt(summary_f, binarycrossentropy_train)
-        summary_f.write('binarycrossentropy_val: ')
-        np.savetxt(summary_f, binarycrossentropy_val)
-        summary_f.write('binarycrossentropy_test: ')
-        np.savetxt(summary_f, binarycrossentropy_test)
-        summary_f.write('auc_train: ')
-        np.savetxt(summary_f, auc_train)
-        summary_f.write('auc_val: ')
-        np.savetxt(summary_f, auc_val)
-        summary_f.write('auc_test: ')
-        np.savetxt(summary_f, auc_test)
+        with open(summary_file, 'w+') as summary_f:
+            summary_f.write('accuracy_train: ')
+            summary_f.write(str(accuracy_train[k]))
+            summary_f.write('\n')
+            summary_f.write('accuracy_val: ')
+            summary_f.write(str(accuracy_val[k]))
+            summary_f.write('\n')
+            summary_f.write('accuracy_test: ')
+            summary_f.write(str(accuracy_test[k]))
+            summary_f.write('\n')
+            summary_f.write('binarycrossentropy_train: ')
+            summary_f.write(str(binarycrossentropy_train[k]))
+            summary_f.write('\n')
+            summary_f.write('binarycrossentropy_val: ')
+            summary_f.write(str(binarycrossentropy_val[k]))
+            summary_f.write('\n')
+            summary_f.write('binarycrossentropy_test: ')
+            summary_f.write(str(binarycrossentropy_test[k]))
+            summary_f.write('\n')
+            summary_f.write('f1_train: ')
+            summary_f.write(str(f1_train[k]))
+            summary_f.write('\n')
+            summary_f.write('f1_val: ')
+            summary_f.write(str(f1_val[k]))
+            summary_f.write('\n')
+            summary_f.write('f1_test: ')
+            summary_f.write(str(f1_test[k]))
+            summary_f.write('\n')
+            summary_f.write('auc_train: ')
+            summary_f.write(str(auc_train[k]))
+            summary_f.write('\n')
+            summary_f.write('auc_val: ')
+            summary_f.write(str(auc_val[k]))
+            summary_f.write('\n')
+            summary_f.write('auc_test: ')
+            summary_f.write(str(auc_test[k]))
+            summary_f.write('\n')
 
-        summary_f.write('')
+            summary_f.write('')
 
+    with open(summary_file, 'w+') as summary_f:
         summary_f.write('Mean accuracy_train: ')
-        np.savetxt(summary_f, accuracy_train.mean())
+        summary_f.write(str(accuracy_train.mean()))
+        summary_f.write('\n')
         summary_f.write('Mean accuracy_val: ')
-        np.savetxt(summary_f, accuracy_val.mean())
+        summary_f.write(str(accuracy_val.mean()))
+        summary_f.write('\n')
         summary_f.write('Mean accuracy_test: ')
-        np.savetxt(summary_f, accuracy_test.mean())
+        summary_f.write(str(accuracy_test.mean()))
+        summary_f.write('\n')
         summary_f.write('Mean binarycrossentropy_train: ')
-        np.savetxt(summary_f, binarycrossentropy_train.mean())
+        summary_f.write(str(binarycrossentropy_train.mean()))
+        summary_f.write('\n')
         summary_f.write('Mean binarycrossentropy_val: ')
-        np.savetxt(summary_f, binarycrossentropy_val.mean())
+        summary_f.write(str(binarycrossentropy_val.mean()))
+        summary_f.write('\n')
         summary_f.write('Mean binarycrossentropy_test: ')
-        np.savetxt(summary_f, binarycrossentropy_test.mean())
+        summary_f.write(str(binarycrossentropy_test.mean()))
+        summary_f.write('\n')
+        summary_f.write('Mean f1_train: ')
+        summary_f.write(str(f1_train.mean()))
+        summary_f.write('\n')
+        summary_f.write('Mean f1_val: ')
+        summary_f.write(str(f1_val.mean()))
+        summary_f.write('\n')
+        summary_f.write('Mean f1_test: ')
+        summary_f.write(str(f1_test.mean()))
+        summary_f.write('\n')
         summary_f.write('Mean auc_train: ')
-        np.savetxt(summary_f, auc_train.mean())
+        summary_f.write(str(auc_train.mean()))
+        summary_f.write('\n')
         summary_f.write('Mean auc_val: ')
-        np.savetxt(summary_f, auc_val.mean())
+        summary_f.write(str(auc_val.mean()))
+        summary_f.write('\n')
         summary_f.write('Mean auc_test: ')
-        np.savetxt(summary_f, auc_test.mean())
+        summary_f.write(str(auc_test.mean()))
+        summary_f.write('\n')
 
 def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
 
@@ -196,40 +286,35 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
 
 if __name__ == "__main__":
-    with tf.device('/device:GPU:2'):
-        seed = 42
-        np.random.seed(seed)
+    seed = 42
+    np.random.seed(seed)
 
-        X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
-        y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
-        X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS.pkl', 'rb')
-        y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS.pkl', 'rb')
-        X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
-        y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+    X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
+    y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
+    X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS.pkl', 'rb')
+    y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS.pkl', 'rb')
+    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
+    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
 
-        X_train = pickle.load(X_train_file)
-        X_train = X_train[::2]
-        y_train = pickle.load(y_train_file)
-        y_train = y_train[::2]
-        X_val = pickle.load(X_val_file)
-        X_val = X_val[::2]
-        y_val = pickle.load(y_val_file)
-        y_val = y_val[::2]
-        X_test = pickle.load(X_test_file)
-        y_test = pickle.load(y_test_file)
+    X_train = pickle.load(X_train_file)
+    y_train = pickle.load(y_train_file)
+    X_val = pickle.load(X_val_file)
+    y_val = pickle.load(y_val_file)
+    X_test = pickle.load(X_test_file)
+    y_test = pickle.load(y_test_file)
 
-        X_train_file.close()
-        y_train_file.close()
-        X_val_file.close()
-        y_val_file.close()
-        X_test_file.close()
-        y_test_file.close()
-        
-        if len(sys.argv) < 2:
-            run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
-        else:
-            run_id = sys.argv[1]
-            #run_id = "".join(categories)
+    X_train_file.close()
+    y_train_file.close()
+    X_val_file.close()
+    y_val_file.close()
+    X_test_file.close()
+    y_test_file.close()
+    
+    if len(sys.argv) < 2:
+        run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
+    else:
+        run_id = sys.argv[1]
+        #run_id = "".join(categories)
 
-        single_train(lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-        #k_train(lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #single_train(lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    k_train(lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
