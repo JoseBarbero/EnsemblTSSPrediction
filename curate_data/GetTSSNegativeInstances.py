@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import re
 import random
+import sys
 
 '''
 This script gets a dataframe (created by GetTSSFlanks.py) and generates negative ones.
@@ -11,10 +12,13 @@ Usually we find 10 negative instances to every positive one, so this a good valu
 We keep those 10 negative instances in a new column of the dataframe as a list. This is the easiest way to allow filtering these instances by chromosome, gene, etc.
 '''
 
+POS_TO_NEG_RATIO = 10   # We generate N negative instances for every positive one
 
-POS_INSTANCES_DF = '../rawdata/TSS/EveryEnsemblTranscript_withTSS_dataframe.csv'
-POS_TO_NEG_RATIO = 1   # We generate N negative instances for every positive one
-DATAFRAME_OUT_FILE = '../rawdata/TSS/EveryEnsemblTranscript_pos_and_neg_TSS.csv'
+#POS_INSTANCES_DF = '../rawdata/TSS/EveryEnsemblTranscript_withTSS_dataframe.csv'
+#DATAFRAME_OUT_FILE = '../rawdata/TSS/EveryEnsemblTranscript_pos_and_neg_TSS.csv'
+
+POS_INSTANCES_DF = sys.argv[1]
+DATAFRAME_OUT_FILE = sys.argv[2]
 
 
 ensembl_df = pd.read_csv(POS_INSTANCES_DF)

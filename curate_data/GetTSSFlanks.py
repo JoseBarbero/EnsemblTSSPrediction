@@ -1,7 +1,7 @@
 from Bio import SeqIO
 import pandas as pd
 import numpy as np
-
+import sys
 
 '''
 This script gets a dataframe (created by InstancesToDataframe.py) and adds 4 new fields:
@@ -14,8 +14,11 @@ This script gets a dataframe (created by InstancesToDataframe.py) and adds 4 new
 
 #DATAFRAME_CSV = 'EveryEnsemblTranscript_dataframe.csv'
 #FLANK_LENGTH = 0
-DATAFRAME_CSV = '../rawdata/EveryEnsemblTranscript_withflanks_dataframe.csv'
-DATAFRAME_OUT_FILE = '../rawdata/TSS/EveryEnsemblTranscript_withTSS_dataframe.csv'
+#DATAFRAME_CSV = '../rawdata/EveryEnsemblTranscript_withflanks_dataframe.csv'
+#DATAFRAME_OUT_FILE = '../rawdata/TSS/EveryEnsemblTranscript_withTSS_dataframe.csv'
+
+DATAFRAME_CSV = sys.argv[1]
+DATAFRAME_OUT_FILE = sys.argv[2]
 
 # The sequence from Ensemble comes with 1000 bases before and after the transcript
 UPSTREAM_FLANK_LENGTH = 1000
