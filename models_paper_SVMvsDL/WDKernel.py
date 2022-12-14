@@ -164,7 +164,7 @@ def fill_per_window_different_matrix(args):
             tmp[idx_x, idx_y] = Kvalue(X1_g[idx_x], X2_g[idx_y], L, d_g)
 
 
-def parallel_wdkernel_gram_matrix(X1, X2, ncores=20, d=10):
+def parallel_wdkernel_gram_matrix(X1, X2, ncores=32, d=10):
     # https://web.archive.org/web/20201211130940/https://jonasteuwen.github.io/numpy/python/multiprocessing/2017/01/07/multiprocessing-numpy-array.html
 
     # Needed for multiprocessing

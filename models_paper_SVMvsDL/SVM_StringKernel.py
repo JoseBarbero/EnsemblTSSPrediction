@@ -51,12 +51,12 @@ y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(
 # Get a random 1% subset of X_train and y_train
 random.seed(42)
 train_size = X_train.shape[0]
-idx = random.choice(train_size, int(train_size*0.01), replace=False)
+idx = random.choice(train_size, int(train_size*0.1), replace=False)
 X_train = X_train[idx]
 y_train = y_train[idx]
 
 test_size = X_test.shape[0]
-idx = random.choice(test_size, int(test_size*0.01), replace=False)
+idx = random.choice(test_size, int(test_size*0.1), replace=False)
 X_test = X_test[idx]
 y_test = y_test[idx]
 
