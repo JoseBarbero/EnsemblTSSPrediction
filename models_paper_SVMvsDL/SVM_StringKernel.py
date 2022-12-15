@@ -8,7 +8,7 @@ from contextlib import redirect_stdout
 from datetime import datetime
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score, roc_auc_score, accuracy_score
+from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score, roc_auc_score, accuracy_score, f1_score
 from sklearn.metrics import classification_report  # classfication summary
 from sklearn.metrics import log_loss
 import matplotlib.pyplot as plt
@@ -49,14 +49,16 @@ X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
 y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
 
 # Get a random 1% subset of X_train and y_train
+subset_pc_size = sys.argv[2]/100
+
 random.seed(42)
 train_size = X_train.shape[0]
-idx = random.choice(train_size, int(train_size*0.1), replace=False)
+idx = random.choice(train_size, int(train_size*subset_pc_size), replace=False)
 X_train = X_train[idx]
 y_train = y_train[idx]
 
 test_size = X_test.shape[0]
-idx = random.choice(test_size, int(test_size*0.1), replace=False)
+idx = random.choice(test_size, int(test_size*subset_pc_size), replace=False)
 X_test = X_test[idx]
 y_test = y_test[idx]
 
@@ -89,11 +91,13 @@ with open(log_file, 'w') as f:
         print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
         print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))
         print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train_gram)))
+        print('\tF1 score:', f1_score(y_train, y_pred_train))
 
         print('Test results:')
         print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
         print('\tBinary crossentropy:', log_loss(y_test, y_pred_test))
         print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
+        print('\tF1 score:', f1_score(y_test, y_pred_test))
 
         # https://scikit-learn.org/stable/modules/svm.html
         print('Number of support vectors for each class:', clf.n_support_)
