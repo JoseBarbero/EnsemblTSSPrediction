@@ -37,7 +37,7 @@ X_test_file.close()
 y_train_file.close()
 y_test_file.close()
 
-subset_pc_size = sys.argv[2]/100
+subset_pc_size = int(sys.argv[2])/100
 
 # Get a random 1% subset of X_train and y_train
 random.seed(42)

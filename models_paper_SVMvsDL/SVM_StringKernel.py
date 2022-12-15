@@ -49,7 +49,7 @@ X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
 y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
 
 # Get a random 1% subset of X_train and y_train
-subset_pc_size = sys.argv[2]/100
+subset_pc_size = int(sys.argv[2])/100
 
 random.seed(42)
 train_size = X_train.shape[0]
