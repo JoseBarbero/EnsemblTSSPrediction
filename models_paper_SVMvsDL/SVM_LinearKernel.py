@@ -70,8 +70,6 @@ y_pred_train = clf.predict(X_train)
 log_file = "logs/"+run_id+".log"
 plot_file = "logs/"+run_id+".png"
 model_file = "logs/"+run_id+".pkl"
-
-log_file = "logs/"+run_id+".log"
 X_train_file = "logs/"+run_id+"_X_train.pkl"
 X_test_file = "logs/"+run_id+"_X_test.pkl"
 y_train_file = "logs/"+run_id+"_y_train.pkl"
