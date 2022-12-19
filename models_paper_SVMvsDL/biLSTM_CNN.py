@@ -239,6 +239,13 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     hist_file = "logs/"+run_id+".pkl"
     plot_file = "logs/"+run_id+".png" 
     model_file = "logs/"+run_id+".h5"  
+    X_train_file = "logs/"+run_id+"_X_train.pkl"
+    X_val_file = "logs/"+run_id+"_X_val.pkl"
+    X_test_file = "logs/"+run_id+"_X_test.pkl"
+    y_train_file = "logs/"+run_id+"_y_train.pkl"
+    y_val_file = "logs/"+run_id+"_y_val.pkl"
+    y_test_file = "logs/"+run_id+"_y_test.pkl"
+    y_pred_file = "logs/"+run_id+"_y_pred.pkl"
 
     logdir = os.path.dirname(log_file)
     if not os.path.exists(logdir):
@@ -276,6 +283,27 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     model.save(model_file)
     with open(hist_file, 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
+    
+    with open(X_train_file, 'wb') as file_pi:
+        pickle.dump(X_train, file_pi)
+
+    with open(X_val_file, 'wb') as file_pi:
+        pickle.dump(X_val, file_pi)
+
+    with open(X_test_file, 'wb') as file_pi:
+        pickle.dump(X_test, file_pi)
+
+    with open(y_train_file, 'wb') as file_pi:
+        pickle.dump(y_train, file_pi)
+
+    with open(y_val_file, 'wb') as file_pi:
+        pickle.dump(y_val, file_pi)
+
+    with open(y_test_file, 'wb') as file_pi:
+        pickle.dump(y_test, file_pi)
+
+    with open(y_pred_file, 'wb') as file_pi:
+        pickle.dump(model.predict(X_test), file_pi)
 
 
 
