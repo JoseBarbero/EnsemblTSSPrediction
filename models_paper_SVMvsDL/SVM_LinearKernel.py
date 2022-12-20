@@ -64,9 +64,9 @@ clf.fit(X_train, y_train)
 
 # Prediction
 y_pred_test = clf.predict(X_test)
-y_proba_test = clf.predict_proba(X_test)
+y_proba_test = clf.predict_proba(X_test)[:, 1]
 y_pred_train = clf.predict(X_train)
-y_proba_train = clf.predict_proba(X_train)
+y_proba_train = clf.predict_proba(X_train)[:, 1]
 
 # Save results
 log_file = "logs/"+run_id+".log"
