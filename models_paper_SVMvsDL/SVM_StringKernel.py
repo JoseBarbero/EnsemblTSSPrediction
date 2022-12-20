@@ -75,6 +75,8 @@ clf.fit(X_train_gram, y_train)
 # Prediction
 y_pred_test = clf.predict(X_test_gram)
 y_pred_train = clf.predict(X_train_gram)
+y_proba_test = clf.predict_proba(X_test_gram)
+y_proba_train = clf.predict_proba(X_train_gram)
 
 # Save results
 log_file = "logs/"+run_id+".log"
@@ -86,6 +88,8 @@ y_train_file = "logs/"+run_id+"_y_train.pkl"
 y_pred_train_file = "logs/"+run_id+"_y_pred_train.pkl"
 y_test_file = "logs/"+run_id+"_y_test.pkl"
 y_pred_test_file = "logs/"+run_id+"_y_pred_test.pkl"
+y_proba_train_file = "logs/"+run_id+"_y_proba_train.pkl"
+y_proba_test_file = "logs/"+run_id+"_y_proba_test.pkl"
 
 pickle.dump(clf, open(model_file, 'wb'))
 pickle.dump(X_train, open(X_train_file, 'wb'))
@@ -94,6 +98,8 @@ pickle.dump(y_train, open(y_train_file, 'wb'))
 pickle.dump(y_test, open(y_test_file, 'wb'))
 pickle.dump(y_pred_train, open(y_pred_train_file, 'wb'))
 pickle.dump(y_pred_test, open(y_pred_test_file, 'wb'))
+pickle.dump(y_proba_train, open(y_proba_train_file, 'wb'))
+pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'))
 
 with open(log_file, 'w') as f:
     with redirect_stdout(f):
