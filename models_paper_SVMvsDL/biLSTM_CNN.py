@@ -285,25 +285,25 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
         pickle.dump(history.history, file_pi)
     
     with open(X_train_file, 'wb') as file_pi:
-        pickle.dump(X_train, file_pi)
+        pickle.dump(X_train, file_pi, protocol=4)
 
     with open(X_val_file, 'wb') as file_pi:
-        pickle.dump(X_val, file_pi)
+        pickle.dump(X_val, file_pi, protocol=4)
 
     with open(X_test_file, 'wb') as file_pi:
-        pickle.dump(X_test, file_pi)
+        pickle.dump(X_test, file_pi, protocol=4)
 
     with open(y_train_file, 'wb') as file_pi:
-        pickle.dump(y_train, file_pi)
+        pickle.dump(y_train, file_pi, protocol=4)
 
     with open(y_val_file, 'wb') as file_pi:
-        pickle.dump(y_val, file_pi)
+        pickle.dump(y_val, file_pi, protocol=4)
 
     with open(y_test_file, 'wb') as file_pi:
-        pickle.dump(y_test, file_pi)
+        pickle.dump(y_test, file_pi, protocol=4)
 
     with open(y_pred_file, 'wb') as file_pi:
-        pickle.dump(model.predict(X_test), file_pi)
+        pickle.dump(model.predict(X_test), file_pi, protocol=4)
 
 
 

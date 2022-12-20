@@ -62,7 +62,7 @@ print('X_test shape:', X_test.shape)
 
 # FastSK kernel (default values)
 start = time.time()
-g = 3
+g = 2
 m = 2
 C = 1
 t = 20      # Number of threads to use for kernel computation
