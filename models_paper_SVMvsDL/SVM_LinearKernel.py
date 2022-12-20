@@ -59,7 +59,7 @@ print('X_train shape:', X_train.shape)
 print('X_test shape:', X_test.shape)
 
 # Model with rbf kernel
-clf = SVC(kernel='rbf')
+clf = SVC(kernel='rbf', probability=True)
 clf.fit(X_train, y_train)
 
 # Prediction

@@ -69,7 +69,7 @@ X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train)    # Importante que
 
 
 # Model
-clf = SVC(kernel='precomputed')
+clf = SVC(kernel='precomputed', probability=True)
 clf.fit(X_train_gram, y_train)
 
 # Prediction
