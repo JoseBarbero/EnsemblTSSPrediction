@@ -81,15 +81,15 @@ y_test_file = "logs/"+run_id+"_y_test.pkl"
 y_pred_test_file = "logs/"+run_id+"_y_pred_test.pkl"
 y_proba_test_file = "logs/"+run_id+"_y_proba_test.pkl"
 
-pickle.dump(clf, open(model_file, 'wb'))
-pickle.dump(X_train, open(X_train_file, 'wb'))
-pickle.dump(X_test, open(X_test_file, 'wb'))
-pickle.dump(y_train, open(y_train_file, 'wb'))
-pickle.dump(y_test, open(y_test_file, 'wb'))
-pickle.dump(y_pred_train, open(y_pred_train_file, 'wb'))
-pickle.dump(y_pred_test, open(y_pred_test_file, 'wb'))
-pickle.dump(y_proba_train, open(y_proba_train_file, 'wb'))
-pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'))
+pickle.dump(clf, open(model_file, 'wb'), protocol=4)
+pickle.dump(X_train, open(X_train_file, 'wb'), protocol=4)
+pickle.dump(X_test, open(X_test_file, 'wb'), protocol=4)
+pickle.dump(y_train, open(y_train_file, 'wb'), protocol=4)
+pickle.dump(y_test, open(y_test_file, 'wb'), protocol=4)
+pickle.dump(y_pred_train, open(y_pred_train_file, 'wb'), protocol=4)
+pickle.dump(y_pred_test, open(y_pred_test_file, 'wb'), protocol=4)
+pickle.dump(y_proba_train, open(y_proba_train_file, 'wb'), protocol=4)
+pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'), protocol=4)
 
 with open(log_file, 'w') as f:
     with redirect_stdout(f):
