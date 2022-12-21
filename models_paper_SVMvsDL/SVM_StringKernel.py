@@ -75,8 +75,8 @@ clf.fit(X_train_gram, y_train)
 # Prediction
 y_pred_test = clf.predict(X_test_gram)
 y_pred_train = clf.predict(X_train_gram)
-y_proba_test = clf.predict_proba(X_test_gram)
-y_proba_train = clf.predict_proba(X_train_gram)
+y_proba_test = clf.predict_proba(X_test_gram)[:, 1]
+y_proba_train = clf.predict_proba(X_train_gram)[:, 1]
 
 # Save results
 log_file = "logs/"+run_id+".log"
