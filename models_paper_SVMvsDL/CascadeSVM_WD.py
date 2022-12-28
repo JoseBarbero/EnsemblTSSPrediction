@@ -38,8 +38,8 @@ class CascadeSVM_WD():
         self._estimator_type = "classifier"
 
     def __get_sv__(self,id,X,y):
-        X = parallel_wdkernel_gram_matrix(X, X)
-        self.base_svc.fit(X,y)
+        X_gram_matrix = parallel_wdkernel_gram_matrix(X, X)
+        self.base_svc.fit(X_gram_matrix,y)
         ind_sv = self.base_svc.support_
         X = X[ind_sv, :]
         y = y[ind_sv]
