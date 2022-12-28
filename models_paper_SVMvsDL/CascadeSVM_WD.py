@@ -81,7 +81,7 @@ class CascadeSVM_WD():
             id, X, y = self.__kfold_svc__(id, X, y)
             n_new = X.shape[0]
             if self.verbose:
-                print("Number of remaining instances: "+str(n_new))
+                print("Number of remaining instances (support vectors): "+str(n_new))
             while((n_new>2*self.fold_size)&(((n_init-n_new)/n_init)>0.1)):
                 k = k+1
                 n_init = n_new
@@ -99,6 +99,7 @@ class CascadeSVM_WD():
             self.support_ = id
         if self.verbose:
             print("Final number of support vectors: "+str(len(self.support_)))
+        return n_new
     
     def decision_function(self,X):
         return self.base_svc.decision_function(X)
@@ -179,7 +180,7 @@ print('X_test shape:', X_test.shape)
 fold_size=X_train.shape[0]/10
 print("Fold size: "+str(fold_size))
 clf = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
-clf.fit(X_train, y_train)
+X_train = clf.fit(X_train, y_train)
 
 # Prediction
 X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train)
