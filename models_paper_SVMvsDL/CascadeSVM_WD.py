@@ -183,11 +183,12 @@ print('X_test shape:', X_test.shape)
 fold_size=X_train.shape[0]/10
 print("Fold size: "+str(fold_size))
 clf = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
-X_train_idx = clf.fit(X_train, y_train)
+train_idx = clf.fit(X_train, y_train)
 
 # Prediction
-X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[X_train_idx])
-X_train_gram = parallel_wdkernel_gram_matrix(X_train[X_train_idx], X_train[X_train_idx])
+X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[train_idx])
+X_train_gram = parallel_wdkernel_gram_matrix(X_train[train_idx], X_train[train_idx])
+y_train = y_train[train_idx]
 y_pred_test = clf.predict(X_test_gram)
 y_pred_train = clf.predict(X_train_gram)
 y_proba_test = clf.predict_proba(X_test_gram)[:, 1]
