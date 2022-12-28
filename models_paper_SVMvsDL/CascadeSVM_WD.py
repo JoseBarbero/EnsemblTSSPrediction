@@ -230,7 +230,7 @@ with open(log_file, 'w') as f:
         print('\tF1 score:', f1_score(y_test, y_pred_test))
 
         # https://scikit-learn.org/stable/modules/svm.html
-        print('Number of support vectors for each class:', clf.n_support_)
+        print('Number of support vectors for each class:', clf.support_.shape[0])
 
         # Time
         print('Elapsed time:', str(timedelta(seconds=time.time() - start)))
