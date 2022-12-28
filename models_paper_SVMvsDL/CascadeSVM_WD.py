@@ -94,12 +94,14 @@ class CascadeSVM_WD():
             k = k+1
             if self.verbose:
                 print("Cascade step " + str(k))
+            last_train = X
+            last_id = id
             id, X, y = self.__get_sv__(id, X, y)
             self.nsteps = k
             self.support_ = id
         if self.verbose:
             print("Final number of support vectors: "+str(len(self.support_)))
-        return id
+        return last_id
     
     def decision_function(self,X):
         return self.base_svc.decision_function(X)
@@ -160,16 +162,17 @@ X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
 y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
 
 # Get a random 1% subset of X_train and y_train
-subset_pc_size = int(sys.argv[2])/100
+subset_train_size = int(sys.argv[2])/100
+subset_test_size = int(sys.argv[3])/100
 
 random.seed(42)
 train_size = X_train.shape[0]
-idx = random.choice(train_size, int(train_size*subset_pc_size), replace=False)
+idx = random.choice(train_size, int(train_size*subset_train_size), replace=False)
 X_train = X_train[idx]
 y_train = y_train[idx]
 
 test_size = X_test.shape[0]
-idx = random.choice(test_size, int(test_size*subset_pc_size), replace=False)
+idx = random.choice(test_size, int(test_size*subset_test_size), replace=False)
 X_test = X_test[idx]
 y_test = y_test[idx]
 
@@ -183,9 +186,9 @@ clf = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", pr
 X_train_idx = clf.fit(X_train, y_train)
 
 # Prediction
-#X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[X_train_idx])
-y_pred_test = clf.predict(X_test)
-y_pred_train = clf.predict(X_train)
+X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[X_train_idx])
+y_pred_test = clf.predict(X_test_gram)
+y_pred_train = clf.predict(X_train_gram)
 y_proba_test = clf.predict_proba(X_test_gram)[:, 1]
 y_proba_train = clf.predict_proba(X_train_gram)[:, 1]
 
