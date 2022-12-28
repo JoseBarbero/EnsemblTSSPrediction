@@ -178,8 +178,8 @@ print('X_test shape:', X_test.shape)
 # Model
 fold_size=X_train.shape[0]/10
 print("Fold size: "+str(fold_size))
-csvm = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
-csvm.fit(X_train, y_train)
+clf = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
+clf.fit(X_train, y_train)
 
 # Prediction
 X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train)
