@@ -53,6 +53,7 @@ class CascadeSVM_WD():
         idsv = []
         for _, ind in skf.split(X,y):
             id_, X_, y_ = self.__get_sv__(id[ind],X[ind,:],y[ind])
+            print("X_ shape: ", X_.shape)
             idsv.append(id_)
             Xsv.append(X_)
             ysv.append(y_)
