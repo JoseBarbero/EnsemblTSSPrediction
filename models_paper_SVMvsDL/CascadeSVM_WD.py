@@ -176,6 +176,7 @@ print('X_test shape:', X_test.shape)
 
 # Model
 fold_size=train_size/10
+print("Fold size: "+str(fold_size))
 csvm = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
 csvm.fit(X_train, y_train)
 
