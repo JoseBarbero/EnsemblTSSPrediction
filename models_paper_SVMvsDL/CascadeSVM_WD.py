@@ -183,9 +183,9 @@ clf = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", pr
 X_train_idx = clf.fit(X_train, y_train)
 
 # Prediction
-X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[X_train_idx])
-y_pred_test = clf.predict(X_test_gram)
-y_pred_train = clf.predict(X_train_gram)
+#X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[X_train_idx])
+y_pred_test = clf.predict(X_test)
+y_pred_train = clf.predict(X_train)
 y_proba_test = clf.predict_proba(X_test_gram)[:, 1]
 y_proba_train = clf.predict_proba(X_train_gram)[:, 1]
 
