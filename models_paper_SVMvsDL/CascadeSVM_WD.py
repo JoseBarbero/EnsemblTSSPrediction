@@ -175,7 +175,7 @@ print('X_train shape:', X_train.shape)
 print('X_test shape:', X_test.shape)
 
 # Model
-csvm = CascadeSVC(fold_size=10000,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
+csvm = CascadeSVM_WD(fold_size=10000,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
 csvm.fit(X_train, y_train)
 
 # Prediction
