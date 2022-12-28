@@ -207,7 +207,7 @@ def parallel_wdkernel_gram_matrix(X1, X2, ncores=32, d=10):
     p = Pool()
     _ = p.map(fill_per_window, rows)
     result = np.ctypeslib.as_array(shared_array)
-
+    p.close()
     return result
 
 
@@ -243,6 +243,7 @@ def parallel_wdkernel_gram_matrix_with_cgo_get_K_value_version1(X1, X2, ncores=2
     p = Pool()
     _ = p.map(fill_per_window, rows)
     result = np.ctypeslib.as_array(shared_array)
+    p.close()
     return result
 
 
