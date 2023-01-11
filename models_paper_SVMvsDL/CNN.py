@@ -331,12 +331,19 @@ if __name__ == "__main__":
     # Time
     start = time.time()
 
-    X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
-    y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
-    X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS.pkl', 'rb')
-    y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS.pkl', 'rb')
-    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
-    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+    # X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
+    # y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
+    # X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS.pkl', 'rb')
+    # y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS.pkl', 'rb')
+    # X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
+    # y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+
+    X_train_file = open('../data/TSS/onehot_serialized/mouse_X_train_TSS.pkl', 'rb')
+    y_train_file = open('../data/TSS/onehot_serialized/mouse_y_train_TSS.pkl', 'rb')
+    X_val_file = open('../data/TSS/onehot_serialized/mouse_X_val_TSS.pkl', 'rb')
+    y_val_file = open('../data/TSS/onehot_serialized/mouse_y_val_TSS.pkl', 'rb')
+    X_test_file = open('../data/TSS/onehot_serialized/mouse_X_test_TSS.pkl', 'rb')
+    y_test_file = open('../data/TSS/onehot_serialized/mouse_y_test_TSS.pkl', 'rb')
 
     X_train = pickle.load(X_train_file)
     #X_train = X_train[::2]
