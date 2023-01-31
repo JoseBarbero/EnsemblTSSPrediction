@@ -500,9 +500,9 @@ N = X_train_onehot_flat.shape[0]
 # C: number of classes
 C = np.unique(y_train).shape[0]
 # P: number of partitions
-P = 10
+P = 100
 # K: number of clusters
-K = 100
+K = 1000
 # Threshold
 Tgamma = 0.7 # TODO Tune this parameter
 
