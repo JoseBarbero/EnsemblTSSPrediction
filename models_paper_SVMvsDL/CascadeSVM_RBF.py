@@ -132,15 +132,13 @@ y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
 X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
 y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
 
-X_train_seqs = pickle.load(X_train_file)
-X_test_seqs = pickle.load(X_test_file)
+X_train = pickle.load(X_train_file)
+X_test = pickle.load(X_test_file)
 y_train = pickle.load(y_train_file)
 y_test = pickle.load(y_test_file)
 
-X_train_seqs_pos_file.close()
-X_train_seqs_neg_file.close()
-X_test_seqs_pos_file.close()
-X_test_seqs_neg_file.close()
+X_train_file.close()
+X_test_file.close()
 
 # Get a random 1% subset of X_train and y_train
 subset_train_size = int(sys.argv[2])/100
