@@ -178,7 +178,6 @@ y_test = y_test[idx]
 
 print('X_train shape:', X_train.shape)
 print('X_test shape:', X_test.shape)
-print ('y_train shape:', y_train.shape)
 
 # Model
 fold_size=X_train.shape[0]/10

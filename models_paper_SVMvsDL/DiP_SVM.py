@@ -49,13 +49,7 @@ class CascadeDiPSVM_WD():
         ysv = []
         idsv = []
         for fold_idxs in folds_idxs:
-            a = X[fold_idxs]
-            b = y[fold_idxs]
-            print("fold_idxs shape: ", fold_idxs.shape)
-            print("a shape: ", a.shape)
-            print("b shape: ", b.shape)
             id_, X_, y_ = self.__get_sv__(fold_idxs,X[fold_idxs],y[fold_idxs])
-            print("X_ shape: ", X_.shape)
             idsv.append(id_)
             Xsv.append(X_)
             ysv.append(y_)
@@ -92,8 +86,11 @@ class CascadeDiPSVM_WD():
         n_new = X.shape[0]
         if self.verbose:
             print("Number of remaining instances (support vectors): "+str(n_new))
+        print("n_init: ", n_init)
+        print("n_new: ", n_new)
+        print("fold_size: ", self.fold_size)
         while((n_new>2*self.fold_size)&(((n_init-n_new)/n_init)>0.1)):
-            k = k+1
+            k = k+10
             n_init = n_new
             if self.verbose:
                 print("Cascade step " + str(k))
@@ -101,6 +98,9 @@ class CascadeDiPSVM_WD():
             n_new = X.shape[0]
             if self.verbose:
                 print("Number of remaining instances: " + str(n_new))
+                print("n_init: ", n_init)
+                print("n_new: ", n_new)
+                print("fold_size: ", self.fold_size)
         k = k+1
         if self.verbose:
             print("Cascade step " + str(k))
@@ -160,28 +160,22 @@ def distribution_preserving_partitioning(D, N, C, P, K):
     Dp = [[] for p in range(P)]
     
     for c in range(C):
-        print("Class: ", c)
         # DcK = dataset of class c clustered into K clusters
         DcK = MiniBatchKMeans(n_clusters=K, random_state=0).fit(Dc[c][:, :-1]) # KMeans causes "core dumped")
         for k in range(K):
-            print("\tCluster: ", k)
             # Dck = dataset of class c and cluster k
             Dck = Dc[c][DcK.labels_ == k]
             # Nck = number of instances in class c and cluster k
             Nck = Dck.shape[0]
             for p in range(P):
-                print("\t\tPartition: ", p)
                 # Nckp = number of instances in class c, cluster k and partition p rounded up
                 Nckp = int(np.ceil(Nck/P))
-                print("\t\t\tNck: ", Nck)
-                print("\t\t\tNckp: ", Nckp)
                 U_idxs = random.choice(Nck, Nckp, replace=False)
                 # Dckp = dataset of class c, cluster k and partition p
                 Dckp = Dck[U_idxs]
                 Dp[p].extend(Dckp)
                 Dck = np.delete(Dck, U_idxs, axis=0)
-                Nck = Dck.shape[0]
-    
+                Nck -= Nckp
     return Dp
 
 def distribution_preserving_partitioning_by_indexes(D, N, C, P, K):
@@ -204,33 +198,179 @@ def distribution_preserving_partitioning_by_indexes(D, N, C, P, K):
     """
     Dc_idxs = group_classwise_by_indexes(D, C)
     Dp_idxs = [[] for p in range(P)]
+    print("Dc_idxs shapes: ", [Dc_idxs[c].shape for c in range(C)])
     for c in range(C):
-        print("Class: ", c)
         # DcK = dataset of class c clustered into K clusters
         DcKmeans = MiniBatchKMeans(n_clusters=K, random_state=0).fit(D[Dc_idxs[c]][:, :-1]) # KMeans causes "core dumped")
         for k in range(K):
-            print("\tCluster: ", k)
             # Dck_idxs = indexes of class c and cluster k
             Dck_idxs = Dc_idxs[c][DcKmeans.labels_ == k]
             # Nck = number of instances in class c and cluster k
             Nck = Dck_idxs.shape[0]
             for p in range(P):
-                print("\t\tPartition: ", p)    
                 # Nckp = number of instances in class c, cluster k and partition p rounded up
                 Nckp = int(np.ceil(Nck/P))
-                print("\t\t\tNck: ", Nck)
-                print("\t\t\tNckp: ", Nckp)
                 # U_idxs Nckp random indexes from Dck_idxs
                 U_idxs = random.choice(Nck, Nckp, replace=False)
                 # Dckp_idxs = indexes of dataset of class c, cluster k and partition p
                 Dckp_idxs = Dck_idxs[U_idxs]
                 Dp_idxs[p].extend(Dckp_idxs)
                 Dck_idxs = np.delete(Dck_idxs, U_idxs, axis=0)
-                Nck = Dck_idxs.shape[0]
+                Nck -= Nckp
     # Return Dp_idxs as a list of arrays
     Dp_idxs = [np.array(Dp_idxs[p]) for p in range(P)]
     return Dp_idxs
 
+
+def dip_svm_learning(D_onehot, D_string, N, P, K, Tgamma, params):
+    """
+    Performs the DIP-SVM learning algorithm.
+
+    Args:
+    D_onehot: dataset in one-hot encoding (kmeans can't handle strings that is why we need one-hot encoding to get the indexes)
+    D_string: dataset in string encoding
+    N: number of instance (vectors) in D
+    P: number of partitions
+    K: number of clusters
+    Tgamma: threshold gamma
+    params: parameters of the SVM
+        kernel_function: kernel function
+        kernel_parameters: kernel parameters
+
+    Returns:
+    S: support vectors
+    alpha: lagrangian multipliers
+    """
+    
+    Dp_idxs = distribution_preserving_partitioning_by_indexes(D_onehot, N, C, P, K)
+    Dp = [D_string[Dp_idxs[p]] for p in range(P)]
+    
+    l = 0 # Level
+    alpha = 0
+    S = []
+    Sl = []
+    
+    next_level_D = []
+    next_level_alpha = []
+    while True:  
+        
+        Slp = []
+        for p in range(P):  # TODO Parallelize
+            # Train the SVM
+            print("Partition: ", p)
+            print("Dp len", len(Dp))
+            print("Dp[p]: ", Dp[p].shape, Dp[p].dtype)
+            Dpl_X = Dp[p][:, :-1].astype('<U1')
+            Dpl_y = Dp[p][:, -1].astype(np.uint8)
+            # Print shapes and types of every X and y arrays
+            print("Dpl_X: ", Dpl_X.shape, Dpl_X.dtype)
+            print("Dpl_y: ", Dpl_y.shape, Dpl_y.dtype)
+            gram_matrix = parallel_wdkernel_gram_matrix(Dpl_X, Dpl_X)
+            svm = SVC(**params)
+            svm.fit(gram_matrix, Dpl_y)
+
+            alpha = get_lagrangian_multiplier(svm)
+            bias = svm.intercept_   # TODO Bias?
+            
+            sv_idxs = svm.support_  # https://github.com/scikit-learn/scikit-learn/issues/20068
+            sv = Dp[p][sv_idxs]
+            nsv = svm.n_support_
+            # Get support vectors where lagrangian multipliers are > 0
+            print ("sv: ", sv.shape, sv.dtype)
+            print ("nsv: ", nsv.shape, nsv.dtype, nsv)
+            print ("alpha: ", alpha.shape, alpha.dtype)
+            # SV shape: (nsv, 1004)
+            # Alpha shape: (1, nsv)
+            Slp.append(sv[alpha[0, :] > 0])
+
+            if P == 1:
+                S = Slp
+                return S, alpha, svm, Dpl_X, Dpl_y
+            else:
+                gamma = svm_score_string_kernel(Dp[p], svm)
+                Rpl = get_relevant_vectors(Slp, gamma, Tgamma)
+                # TODO Send/Receive
+                print("Rpl: ", len(Rpl))
+                next_level_D.extend(Rpl)
+                next_level_alpha.extend(alpha)
+
+        Dp = next_level_D
+        alpha = next_level_alpha
+        next_level_D = []
+        next_level_alpha = []
+        P = int(np.ceil(P/2))
+        l = l+1
+
+def svm_score(D, svm):
+    """
+    Calculates the distance of each instance in D from the hyperplane
+    defined by the SVM.
+
+    Args:
+    D: dataset
+
+    Returns:
+    gamma: distance of each instance in D from the hyperplane
+    """
+    gamma = []
+    for i in range(D.shape[0]):
+        gamma.append(get_distance_from_boundary(D[i, :-1].astype('<U1'), svm))
+    return gamma
+    
+def svm_score_string_kernel(D, svm):
+    """
+    
+    Args:
+    D: dataset
+
+    Returns:
+    gamma: 
+    """
+    
+    # TODO Se puede hacer un apaño utilizando el predict proba y quedarse solo con los que están por encima de X threshold
+    gram_matrix = parallel_wdkernel_gram_matrix(D[:, :-1].astype('<U1'), D[:, :-1].astype('<U1'))
+    return svm.predict_proba(gram_matrix)
+
+
+def get_distance_from_boundary(x, svm):
+    """
+    Calculates the distance of x from the hyperplane defined by the SVM.
+    https://stackoverflow.com/questions/32074239/sklearn-getting-distance-of-each-point-from-decision-boundary
+
+    Args:
+    x: instance
+    svm: SVM
+
+    Returns:
+    gamma: distance of x from the hyperplane
+    """   
+    return np.abs(svm.decision_function(x))
+
+
+def get_relevant_vectors(Slp, gamma, Tgamma):
+    """
+    Returns the relevant vectors of Slp.
+
+    Args:
+    Slp: partition p of the dataset
+    gamma: distance of each instance in D from the hyperplane
+    Tgamma: threshold gamma
+
+    Returns:
+    Rpl: relevant vectors of Slp
+    """         
+    Rpl = []
+    # print("Slp: ", len(Slp))
+    # print("gamma: ", gamma, gamma.shape)
+    for i in range(len(Slp)):
+        # print("gamma[i]: ", gamma[i])
+        if gamma[i][0] > Tgamma or gamma[i][1] > Tgamma:
+            Rpl.append(Slp[i])
+    return Rpl
+
+def get_lagrangian_multiplier(svm):
+    alpha = np.abs(svm.dual_coef_)
+    return alpha
 
 
 def group_classwise(D, C):
@@ -264,9 +404,6 @@ def group_classwise_by_indexes(D, C):
     for c in range(C):
         Dc.append(np.where(D[:, -1] == c)[0])
     return Dc
-
-def dip_svm():
-    pass
 
 def seqs_to_onehot_array(seqs):
     X = []
@@ -316,19 +453,19 @@ y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(
 X_train_seqs, y_train_seqs = shuffle(X_train_seqs, y_train)
 X_test_seqs, y_test = shuffle(X_test_seqs, y_test)
 
-# Get a random 1% subset of X_train and y_train
+# Get a random P% subset of X_train and y_train
 subset_train_size = int(sys.argv[2])/100
 subset_test_size = int(sys.argv[3])/100
 
 random.seed(42)
 train_size = X_train_seqs.shape[0]
 idx = random.choice(train_size, int(train_size*subset_train_size), replace=False)
-X_train = X_train_seqs[idx]
+X_train_seqs = X_train_seqs[idx]
 y_train = y_train[idx]
 
 test_size = X_test_seqs.shape[0]
 idx = random.choice(test_size, int(test_size*subset_test_size), replace=False)
-X_test = X_test_seqs[idx]
+X_test_seqs = X_test_seqs[idx]
 y_test = y_test[idx]
 
 
@@ -347,24 +484,27 @@ X_train_onehot_flat = X_train_onehot.reshape(X_train_onehot.shape[0], -1)
 X_test_onehot_flat = X_test_onehot.reshape(X_test_onehot.shape[0], -1)
 
 # Test
-print("X_train_seqs shape: ", X_train_seqs.shape)
-print("X_train_onehot shape: ", X_train_onehot.shape)
-print("X_train_onehot_flat shape: ", X_train_onehot_flat.shape)
-print("y_train_seqs shape: ", y_train_seqs.shape)
+print("X_train_seqs: ", X_train_seqs.shape, X_train_seqs.dtype)
+print("X_train_onehot: ", X_train_onehot.shape, X_train_onehot.dtype)
+print("X_train_onehot_flat: ", X_train_onehot_flat.shape, X_train_onehot_flat.dtype)
+print("y_train_seqs: ", y_train_seqs.shape, y_train_seqs.dtype)
 
 # dataset
-D = np.concatenate((X_train_onehot_flat, y_train.reshape(-1, 1)), axis=1)
-print("D shape: ", D.shape)
+D_onehot = np.concatenate((X_train_onehot_flat, y_train.reshape(-1, 1)), axis=1)
+D_string = np.concatenate((X_train_seqs, y_train.reshape(-1, 1)), axis=1)
+
+print("D_onehot: ", D_onehot.shape, D_onehot.dtype)
+print("D_string: ", D_string.shape, D_string.dtype)
 # N: number of instance (vectors) in D
 N = X_train_onehot_flat.shape[0]
 # C: number of classes
 C = np.unique(y_train).shape[0]
 # P: number of partitions
-P = 3 #100
+P = 10
 # K: number of clusters
-K = 3 #1000
-
-Dp_idxs = distribution_preserving_partitioning_by_indexes(D, N, C, P, K)
+K = 100
+# Threshold
+Tgamma = 0.7 # TODO Tune this parameter
 
 print("Initial dataset shape: ", X_train_onehot_flat.shape)
 print("Initial dataset labels shape: ", y_train.shape)
@@ -373,23 +513,22 @@ print("Number of classes (C): ", C)
 print("Number of partitions (P): ", P)
 print("Number of clusters (K): ", K)
 
-print("Dp_idxs length: ", len(Dp_idxs))
-for i in range(len(Dp_idxs)):
-    print("Dp_idxs[", i, "]: ", len(Dp_idxs[i]))
-
 print("X_train_seqs shape: ", X_train_seqs.shape)
 print("y_train shape: ", y_train.shape)
 
 # Model
 fold_size=X_train_seqs.shape[0]/10
 print("Fold size: "+str(fold_size))
-clf = CascadeDiPSVM_WD(fold_size=1000,folds_idxs=Dp_idxs,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
-train_idx = clf.fit(X_train_seqs, y_train)
-
+#clf = CascadeDiPSVM_WD(fold_size=1000,folds_idxs=Dp_idxs,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
+#train_idx = clf.fit(X_train_seqs, y_train)
+params = {'kernel': 'precomputed', 'probability': True}
+sv, alpha, clf, X_train, y_train = dip_svm_learning(D_onehot, D_string, N, P, K, Tgamma, params)
+sv = np.array(sv).astype('<U1')[0]
+print("Support vectors shape", sv.shape)
+print("Support vectors", sv)
 # Prediction
-X_test_gram = parallel_wdkernel_gram_matrix(X_test_seqs, X_train_seqs[train_idx])
-X_train_gram = parallel_wdkernel_gram_matrix(X_train_seqs[train_idx], X_train_seqs[train_idx])
-y_train = y_train[train_idx]
+X_train_gram = parallel_wdkernel_gram_matrix(X_train, X_train)
+X_test_gram = parallel_wdkernel_gram_matrix(X_test_seqs, X_train)
 y_pred_test = clf.predict(X_test_gram)
 y_pred_train = clf.predict(X_train_gram)
 y_proba_test = clf.predict_proba(X_test_gram)[:, 1]
