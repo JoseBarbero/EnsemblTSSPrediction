@@ -163,7 +163,7 @@ print('X_train shape:', X_train.shape)
 print('X_test shape:', X_test.shape)
 
 # Model
-fold_size=X_train.shape[0]/10
+fold_size=10000     #X_train.shape[0]/10
 print("Fold size: "+str(fold_size))
 clf = CascadeSVC(fold_size=fold_size,C=0.1,gamma=0.1,kernel="rbf", probability=True)
 train_idx = clf.fit(X_train, y_train)
@@ -197,6 +197,12 @@ with open(log_file, 'w') as f:
     with redirect_stdout(f):
         print(classification_report(y_test, y_pred_test))
         
+        print('Class 0 y_train: ', np.sum(y_train == 0))
+        print('Class 1 y_train: ', np.sum(y_train == 1))
+
+        print('Class 0 y_test: ', np.sum(y_test == 0))
+        print('Class 1 y_test: ', np.sum(y_test == 1))
+
         print('Train results:')
         print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
         print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))

@@ -250,7 +250,7 @@ def dip_svm_learning(D_onehot, D_string, N, P, K, Tgamma, params):
     S = []
     Sl = []
     
-    next_level_D = []
+    next_level_D = [[] for p in range(P)]
     next_level_alpha = []
     while True:  
         
@@ -258,13 +258,15 @@ def dip_svm_learning(D_onehot, D_string, N, P, K, Tgamma, params):
         for p in range(P):  # TODO Parallelize
             # Train the SVM
             print("Partition: ", p)
-            print("Dp len", len(Dp))
-            print("Dp[p]: ", Dp[p].shape, Dp[p].dtype)
+            print("\tDp len", len(Dp))
+            print("\tDp[p]: ", Dp[p].shape, Dp[p].dtype)
             Dpl_X = Dp[p][:, :-1].astype('<U1')
             Dpl_y = Dp[p][:, -1].astype(np.uint8)
             # Print shapes and types of every X and y arrays
-            print("Dpl_X: ", Dpl_X.shape, Dpl_X.dtype)
-            print("Dpl_y: ", Dpl_y.shape, Dpl_y.dtype)
+            print("\tDpl_X: ", Dpl_X.shape, Dpl_X.dtype)
+            print("\tDpl_y: ", Dpl_y.shape, Dpl_y.dtype)
+            print("\tDpl_y class = 0: ", np.count_nonzero(Dpl_y == 0))
+            print("\tDpl_y class = 1: ", np.count_nonzero(Dpl_y == 1))
             gram_matrix = parallel_wdkernel_gram_matrix(Dpl_X, Dpl_X)
             svm = SVC(**params)
             svm.fit(gram_matrix, Dpl_y)
@@ -275,10 +277,9 @@ def dip_svm_learning(D_onehot, D_string, N, P, K, Tgamma, params):
             sv_idxs = svm.support_  # https://github.com/scikit-learn/scikit-learn/issues/20068
             sv = Dp[p][sv_idxs]
             nsv = svm.n_support_
-            # Get support vectors where lagrangian multipliers are > 0
-            print ("sv: ", sv.shape, sv.dtype)
-            print ("nsv: ", nsv.shape, nsv.dtype, nsv)
-            print ("alpha: ", alpha.shape, alpha.dtype)
+            print ("\tsv: ", sv.shape, sv.dtype)
+            print ("\tnsv: ", nsv.shape, nsv.dtype, nsv)
+            print ("\talpha: ", alpha.shape, alpha.dtype)
             # SV shape: (nsv, 1004)
             # Alpha shape: (1, nsv)
             Slp.append(sv[alpha[0, :] > 0])
@@ -287,35 +288,59 @@ def dip_svm_learning(D_onehot, D_string, N, P, K, Tgamma, params):
                 S = Slp
                 return S, alpha, svm, Dpl_X, Dpl_y
             else:
-                gamma = svm_score_string_kernel(Dp[p], svm)
-                Rpl = get_relevant_vectors(Slp, gamma, Tgamma)
+                gamma = svm_score(Dp[p][:, :-1].astype('<U1'),sv, alpha, svm)
+                Tgamma = np.mean(gamma) #Test
+                Rpl = get_relevant_vectors(sv, gamma, Tgamma)
                 # TODO Send/Receive
-                print("Rpl: ", len(Rpl))
-                next_level_D.extend(Rpl)
-                next_level_alpha.extend(alpha)
-
-        Dp = next_level_D
-        alpha = next_level_alpha
-        next_level_D = []
-        next_level_alpha = []
+                print("\tRpl len: ", len(Rpl))
+                print("\tRpl class 0: ", [int(r[-1]) for r in Rpl].count(0))
+                print("\tRpl class 1: ", [int(r[-1]) for r in Rpl].count(1))
+                
+                next_level_D[p].extend(Rpl)
+                next_level_alpha.extend(alpha) # TODO Mirar en el paper
+        
+        Dp = compress_next_level_D(next_level_D, P)
+        alpha = next_level_alpha # TODO Mirar en el paper
         P = int(np.ceil(P/2))
+        next_level_D = [[] for p in range(P)]
+        next_level_alpha = []
         l = l+1
 
-def svm_score(D, svm):
+def compress_next_level_D(next_level_D, P):
+    """
+    Sets the next level D.
+    Now we have P partitions, so we need to compress to P/2 partitions.
+
+    Args:
+    next_level_D: next level D
+    P: number of partitions
+
+    Returns:
+    next_level_D: next level D
+    """
+    next_level_D_uncompressed = next_level_D
+    next_level_P = int(np.ceil(P/2))
+    next_level_D_compressed = [[] for p in range(next_level_P)]
+    for p in range(next_level_P):
+        next_level_D_compressed[p].extend(next_level_D_uncompressed[p])
+        if p+next_level_P < P:
+            next_level_D_compressed[p].extend(next_level_D_uncompressed[p+next_level_P])
+        next_level_D_compressed[p] = np.array(next_level_D_compressed[p])
+    return next_level_D_compressed
+
+def svm_score(D, sv, alpha, svm):
     """
     Calculates the distance of each instance in D from the hyperplane
     defined by the SVM.
 
     Args:
     D: dataset
+    sv: support vectors
 
     Returns:
     gamma: distance of each instance in D from the hyperplane
     """
-    gamma = []
-    for i in range(D.shape[0]):
-        gamma.append(get_distance_from_boundary(D[i, :-1].astype('<U1'), svm))
-    return gamma
+    return get_distances_from_boundary(D, sv, alpha, svm)
     
 def svm_score_string_kernel(D, svm):
     """
@@ -332,19 +357,34 @@ def svm_score_string_kernel(D, svm):
     return svm.predict_proba(gram_matrix)
 
 
-def get_distance_from_boundary(x, svm):
+def get_distances_from_boundary(D, sv, alpha, svm):
     """
-    Calculates the distance of x from the hyperplane defined by the SVM.
+    Calculates the distance of sv from the hyperplane defined by the SVM.
     https://stackoverflow.com/questions/32074239/sklearn-getting-distance-of-each-point-from-decision-boundary
 
     Args:
-    x: instance
+    D: dataset (we need it for the gran matrix)
+    sv: support vectors
+    alpha: lagrangian multiplier
     svm: SVM
 
     Returns:
     gamma: distance of x from the hyperplane
-    """   
-    return np.abs(svm.decision_function(x))
+    """
+    x_gram_matrix = parallel_wdkernel_gram_matrix(sv[:, :-1].astype('<U1'), D)
+    sv_gram_matrix = parallel_wdkernel_gram_matrix(sv[:, :-1].astype('<U1'), sv[:, :-1].astype('<U1'))
+    # Get svm.decision_function for every instance in D
+    y = svm.decision_function(x_gram_matrix)
+    
+    w_norm = 0
+    for i in range(sv_gram_matrix.shape[0]):
+        for j in range(sv_gram_matrix.shape[1]):
+            w_norm += alpha[0][i] * alpha[0][j] * sv_gram_matrix[i][j]
+    distances = y / w_norm
+    # Get the distance of x from the hyperplane
+    gamma = np.abs(distances)
+    print("\tGamma: ", "Mean: ", np.mean(gamma), "Std: ", np.std(gamma), "Max: ", np.max(gamma), "Min: ", np.min(gamma))
+    return gamma
 
 
 def get_relevant_vectors(Slp, gamma, Tgamma):
@@ -359,13 +399,17 @@ def get_relevant_vectors(Slp, gamma, Tgamma):
     Returns:
     Rpl: relevant vectors of Slp
     """         
-    Rpl = []
     # print("Slp: ", len(Slp))
     # print("gamma: ", gamma, gamma.shape)
-    for i in range(len(Slp)):
-        # print("gamma[i]: ", gamma[i])
-        if gamma[i][0] > Tgamma or gamma[i][1] > Tgamma:
-            Rpl.append(Slp[i])
+    # for i in range(len(Slp)):
+    #     # print("gamma[i]: ", gamma[i])
+    #     if gamma[i] > Tgamma: # or gamma[i][1] < Tgamma:
+    #         Rpl.append(Slp[i])
+
+    # Get indexes in gamma array that are > Tgamma and use them to select instaces in Slp
+
+    indexes_above_threshold = np.where(gamma >= Tgamma)[0]
+    Rpl = [Slp[i] for i in indexes_above_threshold]
     return Rpl
 
 def get_lagrangian_multiplier(svm):
@@ -444,6 +488,9 @@ X_train_seqs_neg_file.close()
 X_test_seqs_pos_file.close()
 X_test_seqs_neg_file.close()
 
+# Undersample to keep only 10% of negative instances
+# X_train_seqs_neg = X_train_seqs_neg[:int(len(X_train_seqs_neg) * 0.1)]
+
 X_train_seqs = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
 y_train = np.concatenate([np.ones(len(X_train_seqs_pos), dtype=int), np.zeros(len(X_train_seqs_neg), dtype=int)])
 
@@ -504,7 +551,7 @@ P = 100
 # K: number of clusters
 K = 1000
 # Threshold
-Tgamma = 0.7 # TODO Tune this parameter
+Tgamma = 0.5 # TODO Tune this parameter
 
 print("Initial dataset shape: ", X_train_onehot_flat.shape)
 print("Initial dataset labels shape: ", y_train.shape)
@@ -556,6 +603,12 @@ pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'), protocol=4)
 with open(log_file, 'w') as f:
     with redirect_stdout(f):
         print(classification_report(y_test, y_pred_test))
+
+        print('Class 0 y_train: ', np.sum(y_train == 0))
+        print('Class 1 y_train: ', np.sum(y_train == 1))
+
+        print('Class 0 y_test: ', np.sum(y_test == 0))
+        print('Class 1 y_test: ', np.sum(y_test == 1))
         
         print('Train results:')
         print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))

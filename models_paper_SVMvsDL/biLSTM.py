@@ -276,6 +276,12 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
                                 verbose=True,
                                 validation_data=(X_val, y_val),
                                 callbacks=[early_stopping_monitor, reduce_lr_loss])
+            print('Class 0 y_train: ', np.sum(y_train == 0))
+            print('Class 1 y_train: ', np.sum(y_train == 1))
+
+            print('Class 0 y_test: ', np.sum(y_test == 0))
+            print('Class 1 y_test: ', np.sum(y_test == 1))
+            
             print("Train results:\n")
             test_results(X_train, y_train, model)
             print("Val results:\n")

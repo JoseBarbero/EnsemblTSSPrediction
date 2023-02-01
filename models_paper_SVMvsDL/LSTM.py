@@ -115,6 +115,12 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
                                     validation_data=(X_val, y_val),
                                     callbacks=[early_stopping_monitor, reduce_lr_loss])
 
+                print('Class 0 y_train: ', np.sum(y_train == 0))
+                print('Class 1 y_train: ', np.sum(y_train == 1))
+
+                print('Class 0 y_test: ', np.sum(y_test == 0))
+                print('Class 1 y_test: ', np.sum(y_test == 1))
+                
                 print("Train results:\n")
                 test_results(X_train, y_train, model)
                 print("Val results:\n")

@@ -103,6 +103,13 @@ pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'), protocol=4)
 
 with open(log_file, 'w') as f:
     with redirect_stdout(f):
+        print('Class 0 y_train: ', np.sum(y_train == 0))
+        print('Class 1 y_train: ', np.sum(y_train == 1))
+
+        print('Class 0 y_test: ', np.sum(y_test == 0))
+        print('Class 1 y_test: ', np.sum(y_test == 1))
+        
+        
         print(classification_report(y_test, y_pred_test))
         
         print('Train results:')
