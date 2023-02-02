@@ -235,6 +235,9 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
 
 def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
 
+    # Time
+    start = time.time()
+
     log_file = "logs/"+run_id+".log"
     hist_file = "logs/"+run_id+".pkl"
     plot_file = "logs/"+run_id+".png" 
@@ -287,6 +290,9 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
             print("Test results:\n")
             test_results(X_test, y_test, model)
 
+            # Time formatted in days, hours, minutes and seconds
+            print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")
+
             
     model.save(model_file)
     with open(hist_file, 'wb') as file_pi:
@@ -320,9 +326,6 @@ if __name__ == "__main__":
     #seed = 42
     #np.random.seed(seed)
     #tf.random.set_seed(42)
-
-    # Time
-    start = time.time()
 
     # X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
     # y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
@@ -363,6 +366,3 @@ if __name__ == "__main__":
     
     single_train(cnn_blstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
     #k_train(cnn_blstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-
-    # Time formatted in days, hours, minutes and seconds
-    print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")

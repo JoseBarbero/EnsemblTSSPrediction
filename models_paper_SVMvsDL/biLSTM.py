@@ -238,6 +238,9 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
 
 def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_test, run_id):
 
+    # Time
+    start = time.time()
+
     log_file = "logs/"+run_id+".log"
     hist_file = "logs/"+run_id+".pkl"
     plot_file = "logs/"+run_id+".png" 
@@ -288,7 +291,10 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
             test_results(X_val, y_val, model)
             print("Test results:\n")
             test_results(X_test, y_test, model)
-            
+
+            # Time formatted in days, hours, minutes and seconds
+            print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")
+                    
 
     with open(hist_file, 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
@@ -367,6 +373,3 @@ if __name__ == "__main__":
 
     single_train(bilstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
     #k_train(bilstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-
-    # Time formatted in days, hours, minutes and seconds
-    print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")
