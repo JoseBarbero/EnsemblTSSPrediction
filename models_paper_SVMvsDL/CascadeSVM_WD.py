@@ -7,10 +7,10 @@ from datetime import timedelta
 from contextlib import redirect_stdout
 from datetime import datetime
 from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score, roc_auc_score, accuracy_score, f1_score
 from sklearn.metrics import classification_report  # classfication summary
-from sklearn.metrics import log_loss
+from sklearn.metrics import log_loss, make_scorer
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import random
@@ -36,6 +36,7 @@ class CascadeSVM_WD():
                        gamma=self.gamma, coef0=self.coef0, probability=self.probability)
         self.base_svc = base_svc
         self._estimator_type = "classifier"
+        self.X_trained = None
 
     def __get_sv__(self,id,X,y):
         X_gram_matrix = parallel_wdkernel_gram_matrix(X, X)
@@ -53,7 +54,8 @@ class CascadeSVM_WD():
         idsv = []
         for _, ind in skf.split(X,y):
             id_, X_, y_ = self.__get_sv__(id[ind],X[ind,:],y[ind])
-            print("X_ shape: ", X_.shape)
+            if self.verbose:
+                print("X_ shape: ", X_.shape)
             idsv.append(id_)
             Xsv.append(X_)
             ysv.append(y_)
@@ -71,6 +73,7 @@ class CascadeSVM_WD():
             id, X, y = self.__get_sv__(np.arange(X.shape[0]), X, y)
             self.n_steps = 1
             self.support_ = id
+            last_id = X
         else:
             n_init = X.shape[0]
             k = 1
@@ -101,17 +104,20 @@ class CascadeSVM_WD():
             self.support_ = id
         if self.verbose:
             print("Final number of support vectors: "+str(len(self.support_)))
+        self.X_trained = last_train
         return last_id
     
     def decision_function(self,X):
         return self.base_svc.decision_function(X)
     
     def predict(self,X):
-        pred = self.classes_[self.base_svc.predict(X)]
+        X_gram_matrix = parallel_wdkernel_gram_matrix(X, self.X_trained)
+        pred = self.classes_[self.base_svc.predict(X_gram_matrix)]
         return pred
     
     def predict_proba(self,X):
-        prob = self.base_svc.predict_proba(X)
+        X_gram_matrix = parallel_wdkernel_gram_matrix(X, self.X_trained)
+        prob = self.base_svc.predict_proba(X_gram_matrix)
         return prob
     
     def get_params(self, deep = True):
@@ -129,116 +135,160 @@ class CascadeSVM_WD():
                 setattr(self.base_svc, par, val)
         return self
 
+def run(X_train, y_train, X_test, y_test, run_id, start):
+    # Model
+    fold_size=X_train.shape[0]/10
+    print("Fold size: "+str(fold_size))
+    clf = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
+    train_idx = clf.fit(X_train, y_train)
 
-# Set run id
-if len(sys.argv) < 2:
-    run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
-else:
-    run_id = sys.argv[1]
+    # Prediction
+    X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[train_idx])
+    X_train_gram = parallel_wdkernel_gram_matrix(X_train[train_idx], X_train[train_idx])
+    y_train = y_train[train_idx]
+    y_pred_test = clf.predict(X_test_gram)
+    y_pred_train = clf.predict(X_train_gram)
+    y_proba_test = clf.predict_proba(X_test_gram)[:, 1]
+    y_proba_train = clf.predict_proba(X_train_gram)[:, 1]
 
-# Time
-start = time.time()
+    # Save results
+    log_file = "logs/"+run_id+".log"
+    plot_file = "logs/"+run_id+".png"
+    model_file = "logs/"+run_id+".pkl"
+    y_train_file = "logs/"+run_id+"_y_train.pkl"
+    y_pred_train_file = "logs/"+run_id+"_y_pred_train.pkl"
+    y_test_file = "logs/"+run_id+"_y_test.pkl"
+    y_pred_test_file = "logs/"+run_id+"_y_pred_test.pkl"
+    y_proba_train_file = "logs/"+run_id+"_y_proba_train.pkl"
+    y_proba_test_file = "logs/"+run_id+"_y_proba_test.pkl"
 
-# Read data
-X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')
-X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')
-X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt', 'rb')
-X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt', 'rb')
+    pickle.dump(clf, open(model_file, 'wb'), protocol=4)
+    pickle.dump(y_train, open(y_train_file, 'wb'), protocol=4)
+    pickle.dump(y_test, open(y_test_file, 'wb'), protocol=4)
+    pickle.dump(y_pred_train, open(y_pred_train_file, 'wb'), protocol=4)
+    pickle.dump(y_pred_test, open(y_pred_test_file, 'wb'), protocol=4)
+    pickle.dump(y_proba_train, open(y_proba_train_file, 'wb'), protocol=4)
+    pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'), protocol=4)
 
-X_train_seqs_pos = pickle.load(X_train_seqs_pos_file)
-X_train_seqs_neg = pickle.load(X_train_seqs_neg_file)
-X_test_seqs_pos = pickle.load(X_test_seqs_pos_file)
-X_test_seqs_neg = pickle.load(X_test_seqs_neg_file)
+    with open(log_file, 'w') as f:
+        with redirect_stdout(f):
 
-X_train_seqs_pos_file.close()
-X_train_seqs_neg_file.close()
-X_test_seqs_pos_file.close()
-X_test_seqs_neg_file.close()
+            print('Class 0 y_train: ', np.sum(y_train == 0))
+            print('Class 1 y_train: ', np.sum(y_train == 1))
 
-X_train = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
-y_train = np.concatenate([np.ones(len(X_train_seqs_pos), dtype=int), np.zeros(len(X_train_seqs_neg), dtype=int)])
+            print('Class 0 y_test: ', np.sum(y_test == 0))
+            print('Class 1 y_test: ', np.sum(y_test == 1))
 
-X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
-y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
+            print(classification_report(y_test, y_pred_test))
+            
+            print('Train results:')
+            print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
+            print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))
+            print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train_gram)))
+            print('\tF1 score:', f1_score(y_train, y_pred_train))
 
-# Get a random 1% subset of X_train and y_train
-subset_train_size = int(sys.argv[2])/100
-subset_test_size = int(sys.argv[3])/100
+            print('Test results:')
+            print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
+            print('\tBinary crossentropy:', log_loss(y_test, y_pred_test))
+            print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
+            print('\tF1 score:', f1_score(y_test, y_pred_test))
 
-random.seed(42)
-train_size = X_train.shape[0]
-idx = random.choice(train_size, int(train_size*subset_train_size), replace=False)
-X_train = X_train[idx]
-y_train = y_train[idx]
+            # https://scikit-learn.org/stable/modules/svm.html
+            print('Number of support vectors for each class:', clf.support_.shape[0])
 
-test_size = X_test.shape[0]
-idx = random.choice(test_size, int(test_size*subset_test_size), replace=False)
-X_test = X_test[idx]
-y_test = y_test[idx]
+            # Time
+            print('Elapsed time:', str(timedelta(seconds=time.time() - start)))
 
-print('X_train shape:', X_train.shape)
-print('X_test shape:', X_test.shape)
 
-# Model
-fold_size=X_train.shape[0]/10
-print("Fold size: "+str(fold_size))
-clf = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
-train_idx = clf.fit(X_train, y_train)
+def grid_search(X_train, y_train, X_test, y_test, run_id):
+    
+    # Model
+    print("N samples: "+str(X_train.shape[0]))
+    # Score with f1 and AUC
+    scorer_auc = make_scorer(roc_auc_score, greater_is_better=True)
+    #scorer_f1 = make_scorer(f1_score, greater_is_better=True)
+    #scoring = {'f1': scorer_f1, 'auc': scorer_auc}
 
-# Prediction
-X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[train_idx])
-X_train_gram = parallel_wdkernel_gram_matrix(X_train[train_idx], X_train[train_idx])
-y_train = y_train[train_idx]
-y_pred_test = clf.predict(X_test_gram)
-y_pred_train = clf.predict(X_train_gram)
-y_proba_test = clf.predict_proba(X_test_gram)[:, 1]
-y_proba_train = clf.predict_proba(X_train_gram)[:, 1]
+    clf = CascadeSVM_WD(probability=True)
+    cv = 5
+    # Grid search
+    param_grid = {'C': [0.00001, 0.001, 0.1, 0.5, 1, 10],
+                  'fold_size': [X_train.shape[0]/cv/10, [X_train.shape[0]/cv/100]],
+                  'degree': [3, 5, 10],
+                  'coef0': [0, 0.5, 1],
+                  'verbose': [False],}
+    
+    grid = GridSearchCV(clf, param_grid, refit=True, verbose=3, scoring=scorer_auc, n_jobs=1, cv=cv)
+    grid.fit(X_train, y_train)
 
-# Save results
-log_file = "logs/"+run_id+".log"
-plot_file = "logs/"+run_id+".png"
-model_file = "logs/"+run_id+".pkl"
-y_train_file = "logs/"+run_id+"_y_train.pkl"
-y_pred_train_file = "logs/"+run_id+"_y_pred_train.pkl"
-y_test_file = "logs/"+run_id+"_y_test.pkl"
-y_pred_test_file = "logs/"+run_id+"_y_pred_test.pkl"
-y_proba_train_file = "logs/"+run_id+"_y_proba_train.pkl"
-y_proba_test_file = "logs/"+run_id+"_y_proba_test.pkl"
+    log_file = "logs/"+run_id+".log"
+    with open(log_file, 'w') as f:
+        with redirect_stdout(f):
+            # Print summary
+            print("Best params:", grid.best_params_)
+            # Print scores by params
+            means = grid.cv_results_['mean_test_score']
+            stds = grid.cv_results_['std_test_score']
 
-pickle.dump(clf, open(model_file, 'wb'), protocol=4)
-pickle.dump(y_train, open(y_train_file, 'wb'), protocol=4)
-pickle.dump(y_test, open(y_test_file, 'wb'), protocol=4)
-pickle.dump(y_pred_train, open(y_pred_train_file, 'wb'), protocol=4)
-pickle.dump(y_pred_test, open(y_pred_test_file, 'wb'), protocol=4)
-pickle.dump(y_proba_train, open(y_proba_train_file, 'wb'), protocol=4)
-pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'), protocol=4)
+            for mean, std, params in zip(means, stds, grid.cv_results_['params']):
+                print("%0.3f (+/-%0.03f) for %r"
+                      % (mean, std * 2, params))
+   
 
-with open(log_file, 'w') as f:
-    with redirect_stdout(f):
 
-        print('Class 0 y_train: ', np.sum(y_train == 0))
-        print('Class 1 y_train: ', np.sum(y_train == 1))
+if __name__ == '__main__':
+    # Set run id
+    if len(sys.argv) < 2:
+        run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
+    else:
+        run_id = sys.argv[1]
 
-        print('Class 0 y_test: ', np.sum(y_test == 0))
-        print('Class 1 y_test: ', np.sum(y_test == 1))
+    # Time
+    start = time.time()
 
-        
-        print(classification_report(y_test, y_pred_test))
-        
-        print('Train results:')
-        print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
-        print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))
-        print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train_gram)))
-        print('\tF1 score:', f1_score(y_train, y_pred_train))
+    # Read data
+    X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')
+    X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')
+    X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt', 'rb')
+    X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt', 'rb')
 
-        print('Test results:')
-        print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
-        print('\tBinary crossentropy:', log_loss(y_test, y_pred_test))
-        print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
-        print('\tF1 score:', f1_score(y_test, y_pred_test))
+    X_train_seqs_pos = pickle.load(X_train_seqs_pos_file)
+    X_train_seqs_neg = pickle.load(X_train_seqs_neg_file)
+    X_test_seqs_pos = pickle.load(X_test_seqs_pos_file)
+    X_test_seqs_neg = pickle.load(X_test_seqs_neg_file)
 
-        # https://scikit-learn.org/stable/modules/svm.html
-        print('Number of support vectors for each class:', clf.support_.shape[0])
+    X_train_seqs_pos_file.close()
+    X_train_seqs_neg_file.close()
+    X_test_seqs_pos_file.close()
+    X_test_seqs_neg_file.close()
 
-        # Time
-        print('Elapsed time:', str(timedelta(seconds=time.time() - start)))
+    # Undersample to keep only 10% of negative instances
+    # run_id += "_1to1"
+    # X_train_seqs_neg = X_train_seqs_neg[:int(len(X_train_seqs_neg) * 0.1)]
+
+    X_train = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
+    y_train = np.concatenate([np.ones(len(X_train_seqs_pos), dtype=int), np.zeros(len(X_train_seqs_neg), dtype=int)])
+
+    X_test = np.concatenate([X_test_seqs_pos, X_test_seqs_neg])
+    y_test = np.concatenate([np.ones(len(X_test_seqs_pos), dtype=int), np.zeros(len(X_test_seqs_neg), dtype=int)])
+
+    # Get a random 1% subset of X_train and y_train
+    subset_train_size = int(sys.argv[2])/100
+    subset_test_size = int(sys.argv[3])/100
+
+    random.seed(42)
+    train_size = X_train.shape[0]
+    idx = random.choice(train_size, int(train_size*subset_train_size), replace=False)
+    X_train = X_train[idx]
+    y_train = y_train[idx]
+
+    test_size = X_test.shape[0]
+    idx = random.choice(test_size, int(test_size*subset_test_size), replace=False)
+    X_test = X_test[idx]
+    y_test = y_test[idx]
+
+    print('X_train shape:', X_train.shape)
+    print('X_test shape:', X_test.shape)
+
+    #run(X_train, y_train, X_test, y_test, run_id, start)
+    grid_search(X_train, y_train, X_test, y_test, run_id)

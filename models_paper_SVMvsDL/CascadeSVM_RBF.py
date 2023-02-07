@@ -7,10 +7,10 @@ from datetime import timedelta
 from contextlib import redirect_stdout
 from datetime import datetime
 from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score, roc_auc_score, accuracy_score, f1_score
 from sklearn.metrics import classification_report  # classfication summary
-from sklearn.metrics import log_loss
+from sklearn.metrics import log_loss, make_scorer
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import random
@@ -88,7 +88,7 @@ class CascadeSVC():
                     print("Number of remaining instances: " + str(n_new))
             k = k+1
             if self.verbose:
-                print("Cascade step " + str(k))
+                print("Cascade final step " + str(k))
             id, X, y = self.__get_sv__(id, X, y)
             self.nsteps = k
             self.support_ = id
@@ -117,106 +117,146 @@ class CascadeSVC():
         return self
 
 
-# Set run id
-if len(sys.argv) < 2:
-    run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
-else:
-    run_id = sys.argv[1]
+def grid_search(X_train, y_train, X_test, y_test, run_id):
+    cv = 5
+    # Model
+    print("N samples: "+str(X_train.shape[0]))
+    # Score with f1 and AUC
+    scorer_auc = make_scorer(roc_auc_score, greater_is_better=True)
+    #scorer_f1 = make_scorer(f1_score, greater_is_better=True)
+    #scoring = {'f1': scorer_f1, 'auc': scorer_auc}
+    # Model
+    
+    print("Fold size: "+str(fold_size), flush=True)
 
-# Time
-start = time.time()
+    clf = CascadeSVC(kernel="rbf", probability=True, verbose=True)
 
-# Read data
-X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
-y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
-X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
-y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+    # Grid search
+    param_grid = {'C': [0.00001, 0.001, 0.1],
+                  'fold_size': [X_train.shape[0]/cv/10, [X_train.shape[0]/cv/100]],}
+    
+    grid = GridSearchCV(clf, param_grid, refit=True, verbose=3, scoring=scorer_auc, n_jobs=25, cv=cv)
+    grid.fit(X_train, y_train)
 
-X_train = pickle.load(X_train_file)
-X_test = pickle.load(X_test_file)
-y_train = pickle.load(y_train_file)
-y_test = pickle.load(y_test_file)
+    log_file = "logs/"+run_id+".log"
+    with open(log_file, 'w') as f:
+        with redirect_stdout(f):
+            # Print summary
+            print("Best params:", grid.best_params_, flush=True)
+            # Print scores by params
+            means = grid.cv_results_['mean_test_score']
+            stds = grid.cv_results_['std_test_score']
 
-X_train_file.close()
-X_test_file.close()
+            for mean, std, params in zip(means, stds, grid.cv_results_['params']):
+                print("%0.3f (+/-%0.03f) for %r"
+                      % (mean, std * 2, params))
 
-# Get a random 1% subset of X_train and y_train
-subset_train_size = int(sys.argv[2])/100
-subset_test_size = int(sys.argv[3])/100
+def run(X_train, y_train, X_test, y_test, run_id, start):
+    # Model
+    fold_size=X_train.shape[0]/100
+    print("Fold size: "+str(fold_size))
+    clf = CascadeSVC(fold_size=fold_size, C=0.001, kernel="rbf", probability=True)
+    train_idx = clf.fit(X_train, y_train)
 
-random.seed(42)
-train_size = X_train.shape[0]
-idx = random.choice(train_size, int(train_size*subset_train_size), replace=False)
-X_train = X_train[idx]
-y_train = y_train[idx]
+    # Prediction
+    y_pred_test = clf.predict(X_test)
+    y_pred_train = clf.predict(X_train)
+    y_proba_test = clf.predict_proba(X_test)[:, 1]
+    y_proba_train = clf.predict_proba(X_train)[:, 1]
 
-test_size = X_test.shape[0]
-idx = random.choice(test_size, int(test_size*subset_test_size), replace=False)
-X_test = X_test[idx]
-y_test = y_test[idx]
+    # Save results
+    log_file = "logs/"+run_id+".log"
+    plot_file = "logs/"+run_id+".png"
+    model_file = "logs/"+run_id+".pkl"
+    y_train_file = "logs/"+run_id+"_y_train.pkl"
+    y_pred_train_file = "logs/"+run_id+"_y_pred_train.pkl"
+    y_test_file = "logs/"+run_id+"_y_test.pkl"
+    y_pred_test_file = "logs/"+run_id+"_y_pred_test.pkl"
+    y_proba_train_file = "logs/"+run_id+"_y_proba_train.pkl"
+    y_proba_test_file = "logs/"+run_id+"_y_proba_test.pkl"
 
-# Flatten X_train and X_test
-X_train = X_train.reshape(X_train.shape[0], -1)
-X_test = X_test.reshape(X_test.shape[0], -1)
+    pickle.dump(clf, open(model_file, 'wb'), protocol=4)
+    pickle.dump(y_train, open(y_train_file, 'wb'), protocol=4)
+    pickle.dump(y_test, open(y_test_file, 'wb'), protocol=4)
+    pickle.dump(y_pred_train, open(y_pred_train_file, 'wb'), protocol=4)
+    pickle.dump(y_pred_test, open(y_pred_test_file, 'wb'), protocol=4)
+    pickle.dump(y_proba_train, open(y_proba_train_file, 'wb'), protocol=4)
+    pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'), protocol=4)
 
-print('X_train shape:', X_train.shape)
-print('X_test shape:', X_test.shape)
+    with open(log_file, 'w') as f:
+        with redirect_stdout(f):
+            print(classification_report(y_test, y_pred_test))
+            
+            print('Class 0 y_train: ', np.sum(y_train == 0))
+            print('Class 1 y_train: ', np.sum(y_train == 1))
 
-# Model
-fold_size=10000     #X_train.shape[0]/10
-print("Fold size: "+str(fold_size))
-clf = CascadeSVC(fold_size=fold_size,C=0.1,gamma=0.1,kernel="rbf", probability=True)
-train_idx = clf.fit(X_train, y_train)
+            print('Class 0 y_test: ', np.sum(y_test == 0))
+            print('Class 1 y_test: ', np.sum(y_test == 1))
 
-# Prediction
-y_pred_test = clf.predict(X_test)
-y_pred_train = clf.predict(X_train)
-y_proba_test = clf.predict_proba(X_test)[:, 1]
-y_proba_train = clf.predict_proba(X_train)[:, 1]
+            print('Train results:')
+            print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
+            print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))
+            print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train)))
+            print('\tF1 score:', f1_score(y_train, y_pred_train))
 
-# Save results
-log_file = "logs/"+run_id+".log"
-plot_file = "logs/"+run_id+".png"
-model_file = "logs/"+run_id+".pkl"
-y_train_file = "logs/"+run_id+"_y_train.pkl"
-y_pred_train_file = "logs/"+run_id+"_y_pred_train.pkl"
-y_test_file = "logs/"+run_id+"_y_test.pkl"
-y_pred_test_file = "logs/"+run_id+"_y_pred_test.pkl"
-y_proba_train_file = "logs/"+run_id+"_y_proba_train.pkl"
-y_proba_test_file = "logs/"+run_id+"_y_proba_test.pkl"
+            print('Test results:')
+            print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
+            print('\tBinary crossentropy:', log_loss(y_test, y_pred_test))
+            print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test)))
+            print('\tF1 score:', f1_score(y_test, y_pred_test))
 
-pickle.dump(clf, open(model_file, 'wb'), protocol=4)
-pickle.dump(y_train, open(y_train_file, 'wb'), protocol=4)
-pickle.dump(y_test, open(y_test_file, 'wb'), protocol=4)
-pickle.dump(y_pred_train, open(y_pred_train_file, 'wb'), protocol=4)
-pickle.dump(y_pred_test, open(y_pred_test_file, 'wb'), protocol=4)
-pickle.dump(y_proba_train, open(y_proba_train_file, 'wb'), protocol=4)
-pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'), protocol=4)
+            # https://scikit-learn.org/stable/modules/svm.html
+            print('Number of support vectors for each class:', clf.support_.shape[0])
 
-with open(log_file, 'w') as f:
-    with redirect_stdout(f):
-        print(classification_report(y_test, y_pred_test))
-        
-        print('Class 0 y_train: ', np.sum(y_train == 0))
-        print('Class 1 y_train: ', np.sum(y_train == 1))
+            # Time
+            print('Elapsed time:', str(timedelta(seconds=time.time() - start)))
 
-        print('Class 0 y_test: ', np.sum(y_test == 0))
-        print('Class 1 y_test: ', np.sum(y_test == 1))
 
-        print('Train results:')
-        print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
-        print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))
-        print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train)))
-        print('\tF1 score:', f1_score(y_train, y_pred_train))
+if __name__ == "__main__":
+    # Set run id
+    if len(sys.argv) < 2:
+        run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
+    else:
+        run_id = sys.argv[1]
 
-        print('Test results:')
-        print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
-        print('\tBinary crossentropy:', log_loss(y_test, y_pred_test))
-        print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test)))
-        print('\tF1 score:', f1_score(y_test, y_pred_test))
+    # Time
+    start = time.time()
 
-        # https://scikit-learn.org/stable/modules/svm.html
-        print('Number of support vectors for each class:', clf.support_.shape[0])
+    # Read data
+    X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
+    y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
+    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
+    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
 
-        # Time
-        print('Elapsed time:', str(timedelta(seconds=time.time() - start)))
+    X_train = pickle.load(X_train_file)
+    X_test = pickle.load(X_test_file)
+    y_train = pickle.load(y_train_file)
+    y_test = pickle.load(y_test_file)
+
+    X_train_file.close()
+    X_test_file.close()
+
+    # Get a random 1% subset of X_train and y_train
+    subset_train_size = int(sys.argv[2])/100
+    subset_test_size = int(sys.argv[3])/100
+
+    random.seed(42)
+    train_size = X_train.shape[0]
+    idx = random.choice(train_size, int(train_size*subset_train_size), replace=False)
+    X_train = X_train[idx]
+    y_train = y_train[idx]
+
+    test_size = X_test.shape[0]
+    idx = random.choice(test_size, int(test_size*subset_test_size), replace=False)
+    X_test = X_test[idx]
+    y_test = y_test[idx]
+
+    # Flatten X_train and X_test
+    X_train = X_train.reshape(X_train.shape[0], -1)
+    X_test = X_test.reshape(X_test.shape[0], -1)
+
+    print('X_train shape:', X_train.shape)
+    print('X_test shape:', X_test.shape)
+
+    #run(X_train, y_train, X_test, y_test, run_id, start)
+    grid_search(X_train, y_train, X_test, y_test, run_id)
