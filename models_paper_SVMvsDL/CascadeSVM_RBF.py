@@ -126,8 +126,6 @@ def grid_search(X_train, y_train, X_test, y_test, run_id):
     #scorer_f1 = make_scorer(f1_score, greater_is_better=True)
     #scoring = {'f1': scorer_f1, 'auc': scorer_auc}
     # Model
-    
-    print("Fold size: "+str(fold_size), flush=True)
 
     clf = CascadeSVC(kernel="rbf", probability=True, verbose=True)
 
