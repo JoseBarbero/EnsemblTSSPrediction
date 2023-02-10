@@ -14,6 +14,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Conv2D, Conv3D, Dropout, MaxPooling1D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.callbacks import LearningRateScheduler
+from imblearn.over_sampling import SMOTE
 
 def lstm():
     sequence_input = tf.keras.layers.Input(shape=(1003,4))
@@ -362,6 +363,15 @@ if __name__ == "__main__":
     else:
         run_id = sys.argv[1]
         #run_id = "".join(categories)
+
+    # Apply smote to the training set
+    smote = SMOTE(random_state=42)
+    # Reshape the data to fit the SMOTE algorithm
+    original_shape = X_train.shape
+    X_train = X_train.reshape(X_train.shape[0], X_train.shape[1] * X_train.shape[2])
+    X_train, y_train = smote.fit_resample(X_train, y_train)
+    # Reshape the data back to the original shape
+    X_train = X_train.reshape(X_train.shape[0], original_shape[1], original_shape[2])
 
     single_train(lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
     #k_train(lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)

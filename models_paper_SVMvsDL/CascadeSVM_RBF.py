@@ -127,11 +127,11 @@ def grid_search(X_train, y_train, X_test, y_test, run_id):
     #scoring = {'f1': scorer_f1, 'auc': scorer_auc}
     # Model
 
-    clf = CascadeSVC(kernel="rbf", probability=True, verbose=True)
+    clf = CascadeSVC(kernel="rbf", probability=True, verbose=False)
 
     # Grid search
     param_grid = {'C': [0.00001, 0.001, 0.1],
-                  'fold_size': [X_train.shape[0]/cv/10, [X_train.shape[0]/cv/100]],}
+                  'fold_size': [X_train.shape[0]/cv/10, X_train.shape[0]/cv/100]}
     
     grid = GridSearchCV(clf, param_grid, refit=True, verbose=3, scoring=scorer_auc, n_jobs=25, cv=cv)
     grid.fit(X_train, y_train)
@@ -151,9 +151,9 @@ def grid_search(X_train, y_train, X_test, y_test, run_id):
 
 def run(X_train, y_train, X_test, y_test, run_id, start):
     # Model
-    fold_size=X_train.shape[0]/100
+    fold_size=X_train.shape[0]/1000
     print("Fold size: "+str(fold_size))
-    clf = CascadeSVC(fold_size=fold_size, C=0.001, kernel="rbf", probability=True)
+    clf = CascadeSVC(fold_size=fold_size, C=0.00001, kernel="rbf", probability=True)
     train_idx = clf.fit(X_train, y_train)
 
     # Prediction
@@ -183,6 +183,7 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
 
     with open(log_file, 'w') as f:
         with redirect_stdout(f):
+            print("Parameters: "+str(clf.get_params()))
             print(classification_report(y_test, y_pred_test))
             
             print('Class 0 y_train: ', np.sum(y_train == 0))
@@ -221,10 +222,17 @@ if __name__ == "__main__":
     start = time.time()
 
     # Read data
-    X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
-    y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
-    X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
-    y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+    species = "mouse"
+    if species == "human":
+        X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
+        y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
+        X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
+        y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+    elif species == "mouse":
+        X_train_file = open('../data/TSS/onehot_serialized/mouse_X_train_TSS.pkl', 'rb')
+        y_train_file = open('../data/TSS/onehot_serialized/mouse_y_train_TSS.pkl', 'rb')
+        X_test_file = open('../data/TSS/onehot_serialized/mouse_X_test_TSS.pkl', 'rb')
+        y_test_file = open('../data/TSS/onehot_serialized/mouse_y_test_TSS.pkl', 'rb')
 
     X_train = pickle.load(X_train_file)
     X_test = pickle.load(X_test_file)
@@ -256,5 +264,5 @@ if __name__ == "__main__":
     print('X_train shape:', X_train.shape)
     print('X_test shape:', X_test.shape)
 
-    #run(X_train, y_train, X_test, y_test, run_id, start)
-    grid_search(X_train, y_train, X_test, y_test, run_id)
+    run(X_train, y_train, X_test, y_test, run_id, start)
+    #grid_search(X_train, y_train, X_test, y_test, run_id)

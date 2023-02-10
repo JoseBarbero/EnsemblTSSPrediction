@@ -137,9 +137,9 @@ class CascadeSVM_WD():
 
 def run(X_train, y_train, X_test, y_test, run_id, start):
     # Model
-    fold_size=X_train.shape[0]/10
+    fold_size=X_train.shape[0]/100
     print("Fold size: "+str(fold_size))
-    clf = CascadeSVM_WD(fold_size=fold_size,C=0.1,gamma=0.1,kernel="precomputed", probability=True)
+    clf = CascadeSVM_WD(fold_size=fold_size, C=0.1, kernel="precomputed", probability=True)
     train_idx = clf.fit(X_train, y_train)
 
     # Prediction
@@ -172,6 +172,7 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
 
     with open(log_file, 'w') as f:
         with redirect_stdout(f):
+            print("Parameters: "+str(clf.get_params()))
 
             print('Class 0 y_train: ', np.sum(y_train == 0))
             print('Class 1 y_train: ', np.sum(y_train == 1))
@@ -209,14 +210,11 @@ def grid_search(X_train, y_train, X_test, y_test, run_id):
     #scorer_f1 = make_scorer(f1_score, greater_is_better=True)
     #scoring = {'f1': scorer_f1, 'auc': scorer_auc}
 
-    clf = CascadeSVM_WD(probability=True)
+    clf = CascadeSVM_WD(probability=True, verbose=False)
     cv = 5
     # Grid search
-    param_grid = {'C': [0.00001, 0.001, 0.1, 0.5, 1, 10],
-                  'fold_size': [X_train.shape[0]/cv/10, [X_train.shape[0]/cv/100]],
-                  'degree': [3, 5, 10],
-                  'coef0': [0, 0.5, 1],
-                  'verbose': [False],}
+    param_grid = {'C': [0.00001, 0.001, 0.1, 1],
+                  'fold_size': [X_train.shape[0]/cv/10, X_train.shape[0]/cv/100]}
     
     grid = GridSearchCV(clf, param_grid, refit=True, verbose=3, scoring=scorer_auc, n_jobs=1, cv=cv)
     grid.fit(X_train, y_train)
@@ -247,11 +245,19 @@ if __name__ == '__main__':
     start = time.time()
 
     # Read data
-    X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')
-    X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')
-    X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt', 'rb')
-    X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt', 'rb')
+    species = 'mouse'
+    if species == 'human':
+        X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')
+        X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')
+        X_test_seqs_pos_file = open('../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt', 'rb')
+        X_test_seqs_neg_file = open('../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt', 'rb')
+    elif species == 'mouse':
+        X_train_seqs_pos_file = open('../data/TSS/seqs/mouse_X_train_TSSseqs_pos_chararray.txt', 'rb')
+        X_train_seqs_neg_file = open('../data/TSS/seqs/mouse_X_train_TSSseqs_neg_chararray.txt', 'rb')
+        X_test_seqs_pos_file = open('../data/TSS/seqs/mouse_X_test_TSSseqs_pos_chararray.txt', 'rb')
+        X_test_seqs_neg_file = open('../data/TSS/seqs/mouse_X_test_TSSseqs_neg_chararray.txt', 'rb')
 
+    # Read files
     X_train_seqs_pos = pickle.load(X_train_seqs_pos_file)
     X_train_seqs_neg = pickle.load(X_train_seqs_neg_file)
     X_test_seqs_pos = pickle.load(X_test_seqs_pos_file)
@@ -290,5 +296,5 @@ if __name__ == '__main__':
     print('X_train shape:', X_train.shape)
     print('X_test shape:', X_test.shape)
 
-    #run(X_train, y_train, X_test, y_test, run_id, start)
-    grid_search(X_train, y_train, X_test, y_test, run_id)
+    run(X_train, y_train, X_test, y_test, run_id, start)
+    #grid_search(X_train, y_train, X_test, y_test, run_id)

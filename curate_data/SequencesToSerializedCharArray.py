@@ -11,12 +11,12 @@ def sequences_to_char_array(seqs_array):
     return new
 
 
-X_train_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_pos.txt')
-X_train_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_train_TSSseqs_neg.txt')
-X_val_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_val_TSSseqs_pos.txt')
-X_val_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_val_TSSseqs_neg.txt')
-X_test_seqs_pos = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_pos.txt')
-X_test_seqs_neg = seqfile_to_instances('../data/TSS/seqs/X_test_TSSseqs_neg.txt')
+X_train_seqs_pos = seqfile_to_instances('../data/TSS/seqs/mouse_X_train_TSSseqs_pos.txt')
+X_train_seqs_neg = seqfile_to_instances('../data/TSS/seqs/mouse_X_train_TSSseqs_neg.txt')
+X_val_seqs_pos = seqfile_to_instances('../data/TSS/seqs/mouse_X_val_TSSseqs_pos.txt')
+X_val_seqs_neg = seqfile_to_instances('../data/TSS/seqs/mouse_X_val_TSSseqs_neg.txt')
+X_test_seqs_pos = seqfile_to_instances('../data/TSS/seqs/mouse_X_test_TSSseqs_pos.txt')
+X_test_seqs_neg = seqfile_to_instances('../data/TSS/seqs/mouse_X_test_TSSseqs_neg.txt')
 
 X_train_seqs_pos = sequences_to_char_array(X_train_seqs_pos)
 X_train_seqs_neg = sequences_to_char_array(X_train_seqs_neg)
@@ -26,13 +26,13 @@ X_test_seqs_pos = sequences_to_char_array(X_test_seqs_pos)
 X_test_seqs_neg = sequences_to_char_array(X_test_seqs_neg)
 
 # X pos seqs
-X_TRAIN_SEQS_POS_FILE = '../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt'
-X_VAL_SEQS_POS_FILE = '../data/TSS/seqs/X_val_TSSseqs_pos_chararray.txt'
-X_TEST_SEQS_POS_FILE = '../data/TSS/seqs/X_test_TSSseqs_pos_chararray.txt'
+X_TRAIN_SEQS_POS_FILE = '../data/TSS/seqs/mouse_X_train_TSSseqs_pos_chararray.txt'
+X_VAL_SEQS_POS_FILE = '../data/TSS/seqs/mouse_X_val_TSSseqs_pos_chararray.txt'
+X_TEST_SEQS_POS_FILE = '../data/TSS/seqs/mouse_X_test_TSSseqs_pos_chararray.txt'
 # X neg seqs
-X_TRAIN_SEQS_NEG_FILE = '../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt'
-X_VAL_SEQS_NEG_FILE = '../data/TSS/seqs/X_val_TSSseqs_neg_chararray.txt'
-X_TEST_SEQS_NEG_FILE = '../data/TSS/seqs/X_test_TSSseqs_neg_chararray.txt'
+X_TRAIN_SEQS_NEG_FILE = '../data/TSS/seqs/mouse_X_train_TSSseqs_neg_chararray.txt'
+X_VAL_SEQS_NEG_FILE = '../data/TSS/seqs/mouse_X_val_TSSseqs_neg_chararray.txt'
+X_TEST_SEQS_NEG_FILE = '../data/TSS/seqs/mouse_X_test_TSSseqs_neg_chararray.txt'
 
 X_train_pos_file = open(X_TRAIN_SEQS_POS_FILE, 'wb')
 pickle.dump(X_train_seqs_pos, X_train_pos_file, protocol=4)  # protocol=4 allows to serialize larger files than 4gb
