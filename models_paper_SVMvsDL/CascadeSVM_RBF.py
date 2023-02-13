@@ -222,7 +222,7 @@ if __name__ == "__main__":
     start = time.time()
 
     # Read data
-    species = "mouse"
+    species = sys.argv[4]
     if species == "human":
         X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
         y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
@@ -233,6 +233,9 @@ if __name__ == "__main__":
         y_train_file = open('../data/TSS/onehot_serialized/mouse_y_train_TSS.pkl', 'rb')
         X_test_file = open('../data/TSS/onehot_serialized/mouse_X_test_TSS.pkl', 'rb')
         y_test_file = open('../data/TSS/onehot_serialized/mouse_y_test_TSS.pkl', 'rb')
+    else:
+        print("Species not recognized")
+        exit()
 
     X_train = pickle.load(X_train_file)
     X_test = pickle.load(X_test_file)

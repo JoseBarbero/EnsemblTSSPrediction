@@ -146,10 +146,10 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
     X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[train_idx])
     X_train_gram = parallel_wdkernel_gram_matrix(X_train[train_idx], X_train[train_idx])
     y_train = y_train[train_idx]
-    y_pred_test = clf.predict(X_test_gram)
-    y_pred_train = clf.predict(X_train_gram)
-    y_proba_test = clf.predict_proba(X_test_gram)[:, 1]
-    y_proba_train = clf.predict_proba(X_train_gram)[:, 1]
+    y_pred_test = clf.predict(X_test)
+    y_pred_train = clf.predict(X_train)
+    y_proba_test = clf.predict_proba(X_test)[:, 1]
+    y_proba_train = clf.predict_proba(X_train)[:, 1]
 
     # Save results
     log_file = "logs/"+run_id+".log"
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     start = time.time()
 
     # Read data
-    species = 'mouse'
+    species = sys.argv[4]
     if species == 'human':
         X_train_seqs_pos_file = open('../data/TSS/seqs/X_train_TSSseqs_pos_chararray.txt', 'rb')
         X_train_seqs_neg_file = open('../data/TSS/seqs/X_train_TSSseqs_neg_chararray.txt', 'rb')
@@ -256,6 +256,9 @@ if __name__ == '__main__':
         X_train_seqs_neg_file = open('../data/TSS/seqs/mouse_X_train_TSSseqs_neg_chararray.txt', 'rb')
         X_test_seqs_pos_file = open('../data/TSS/seqs/mouse_X_test_TSSseqs_pos_chararray.txt', 'rb')
         X_test_seqs_neg_file = open('../data/TSS/seqs/mouse_X_test_TSSseqs_neg_chararray.txt', 'rb')
+    else:
+        print("Species not recognized")
+        exit()
 
     # Read files
     X_train_seqs_pos = pickle.load(X_train_seqs_pos_file)

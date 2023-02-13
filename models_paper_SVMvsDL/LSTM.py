@@ -321,6 +321,8 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     with open(y_pred_file, 'wb') as file_pi:
         pickle.dump(model.predict(X_test), file_pi, protocol=4)
 
+    model.save(model_file)
+
 
 if __name__ == "__main__":
     #seed = 42
