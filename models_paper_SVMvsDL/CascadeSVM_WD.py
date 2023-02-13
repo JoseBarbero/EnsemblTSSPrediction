@@ -193,13 +193,13 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
             print('Train results:')
             print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
             print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))
-            print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train)))
+            print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train_gram)))
             print('\tF1 score:', f1_score(y_train, y_pred_train))
 
             print('Test results:')
             print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
             print('\tBinary crossentropy:', log_loss(y_test, y_pred_test))
-            print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test)))
+            print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
             print('\tF1 score:', f1_score(y_test, y_pred_test))
 
             # https://scikit-learn.org/stable/modules/svm.html
