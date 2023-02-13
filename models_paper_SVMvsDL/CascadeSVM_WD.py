@@ -143,8 +143,6 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
     train_idx = clf.fit(X_train, y_train)
 
     # Prediction
-    X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[train_idx])
-    X_train_gram = parallel_wdkernel_gram_matrix(X_train[train_idx], X_train[train_idx])
     y_train = y_train[train_idx]
     y_pred_test = clf.predict(X_test)
     y_pred_train = clf.predict(X_train)
