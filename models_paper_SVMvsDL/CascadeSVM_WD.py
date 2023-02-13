@@ -115,8 +115,16 @@ class CascadeSVM_WD():
         pred = self.classes_[self.base_svc.predict(X_gram_matrix)]
         return pred
     
+    def predict_from_gram_matrix(self, X_gram_matrix):
+        pred = self.classes_[self.base_svc.predict(X_gram_matrix)]
+        return pred
+    
     def predict_proba(self,X):
         X_gram_matrix = parallel_wdkernel_gram_matrix(X, self.X_trained)
+        prob = self.base_svc.predict_proba(X_gram_matrix)
+        return prob
+    
+    def predict_proba_from_gram_matrix(self, X_gram_matrix):
         prob = self.base_svc.predict_proba(X_gram_matrix)
         return prob
     
@@ -143,11 +151,13 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
     train_idx = clf.fit(X_train, y_train)
 
     # Prediction
+    X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[train_idx])
+    X_train_gram = parallel_wdkernel_gram_matrix(X_train[train_idx], X_train[train_idx])
     y_train = y_train[train_idx]
-    y_pred_test = clf.predict(X_test)
-    y_pred_train = clf.predict(X_train)
-    y_proba_test = clf.predict_proba(X_test)[:, 1]
-    y_proba_train = clf.predict_proba(X_train)[:, 1]
+    y_pred_test = clf.predict_from_gram_matrix(X_test_gram)
+    y_pred_train = clf.predict_from_gram_matrix(X_train_gram)
+    y_proba_test = clf.predict_proba_from_gram_matrix(X_test_gram)[:, 1]
+    y_proba_train = clf.predict_proba_from_gram_matrix(X_train_gram)[:, 1]
 
     # Save results
     log_file = "logs/"+run_id+".log"
@@ -183,13 +193,13 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
             print('Train results:')
             print('\tAccuracy score:', accuracy_score(y_train, y_pred_train))
             print('\tBinary crossentropy:', log_loss(y_train, y_pred_train))
-            print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train_gram)))
+            print('\tAUC ROC:', roc_auc_score(y_train, clf.decision_function(X_train)))
             print('\tF1 score:', f1_score(y_train, y_pred_train))
 
             print('Test results:')
             print('\tAccuracy score:', accuracy_score(y_test, y_pred_test))
             print('\tBinary crossentropy:', log_loss(y_test, y_pred_test))
-            print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test_gram)))
+            print('\tAUC ROC:', roc_auc_score(y_test, clf.decision_function(X_test)))
             print('\tF1 score:', f1_score(y_test, y_pred_test))
 
             # https://scikit-learn.org/stable/modules/svm.html
