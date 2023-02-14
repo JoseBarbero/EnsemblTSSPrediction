@@ -169,6 +169,7 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
     y_pred_test_file = "logs/"+run_id+"_y_pred_test.pkl"
     y_proba_train_file = "logs/"+run_id+"_y_proba_train.pkl"
     y_proba_test_file = "logs/"+run_id+"_y_proba_test.pkl"
+    cascaded_X_train_file = "logs/"+run_id+"_cascaded_X_train.pkl"
 
     pickle.dump(clf, open(model_file, 'wb'), protocol=4)
     pickle.dump(y_train, open(y_train_file, 'wb'), protocol=4)
@@ -177,6 +178,7 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
     pickle.dump(y_pred_test, open(y_pred_test_file, 'wb'), protocol=4)
     pickle.dump(y_proba_train, open(y_proba_train_file, 'wb'), protocol=4)
     pickle.dump(y_proba_test, open(y_proba_test_file, 'wb'), protocol=4)
+    pickle.dump(X_train[train_idx], open(cascaded_X_train_file, 'wb'), protocol=4)  # We need to save this to compute the gram matrix for the prediction step
 
     with open(log_file, 'w') as f:
         with redirect_stdout(f):
