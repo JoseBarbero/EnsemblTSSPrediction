@@ -210,7 +210,9 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
             # Time
             print('Elapsed time:', str(timedelta(seconds=time.time() - start)))
 
-
+# TO RUN WITH INTELEX: python -m sklearnex my_application.py
+# Args: python CascadeSVM_RBF.py run_id train_pc test_pc species
+# E.g: python CascadeSVM_RBF.py cascade_rbf_10pc_1 10 10 human
 if __name__ == "__main__":
     # Set run id
     if len(sys.argv) < 2:
@@ -249,7 +251,7 @@ if __name__ == "__main__":
     subset_train_size = int(sys.argv[2])/100
     subset_test_size = int(sys.argv[3])/100
 
-    random.seed(42)
+    #random.seed(42)
     train_size = X_train.shape[0]
     idx = random.choice(train_size, int(train_size*subset_train_size), replace=False)
     X_train = X_train[idx]

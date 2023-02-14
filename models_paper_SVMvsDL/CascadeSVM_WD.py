@@ -293,7 +293,7 @@ if __name__ == '__main__':
     subset_train_size = int(sys.argv[2])/100
     subset_test_size = int(sys.argv[3])/100
 
-    random.seed(42)
+    #random.seed(42)
     train_size = X_train.shape[0]
     idx = random.choice(train_size, int(train_size*subset_train_size), replace=False)
     X_train = X_train[idx]
