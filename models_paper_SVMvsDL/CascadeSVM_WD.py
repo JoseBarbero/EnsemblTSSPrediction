@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy import random
 import pickle 
-from imblearn.over_sampling import SMOTE
 
 
 '''
