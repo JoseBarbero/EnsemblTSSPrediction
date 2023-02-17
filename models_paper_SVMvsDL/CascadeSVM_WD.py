@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy import random
 import pickle 
+from imblearn.over_sampling import SMOTE
 
 
 '''
@@ -282,8 +283,8 @@ if __name__ == '__main__':
     X_test_seqs_neg_file.close()
 
     # Undersample to keep only 10% of negative instances
-    # run_id += "_1to1"
-    # X_train_seqs_neg = X_train_seqs_neg[:int(len(X_train_seqs_neg) * 0.1)]
+    #run_id += "_1to1"
+    #X_train_seqs_neg = X_train_seqs_neg[:int(len(X_train_seqs_neg) * 0.1)]
 
     X_train = np.concatenate([X_train_seqs_pos, X_train_seqs_neg])
     y_train = np.concatenate([np.ones(len(X_train_seqs_pos), dtype=int), np.zeros(len(X_train_seqs_neg), dtype=int)])

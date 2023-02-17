@@ -14,6 +14,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Conv2D, Conv3D, Dropout, MaxPooling1D, MaxPooling2D, Flatten, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.callbacks import LearningRateScheduler
+from imblearn.over_sampling import SMOTE
 
 def cnn_lstm():
     model = Sequential()
@@ -251,6 +252,7 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     y_val_file = "logs/"+run_id+"_y_val.pkl"
     y_test_file = "logs/"+run_id+"_y_test.pkl"
     y_pred_file = "logs/"+run_id+"_y_pred.pkl"
+    y_pred_train_file = "logs/"+run_id+"_y_pred_train.pkl"
 
     logdir = os.path.dirname(log_file)
     if not os.path.exists(logdir):
@@ -319,6 +321,9 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     with open(y_pred_file, 'wb') as file_pi:
         pickle.dump(model.predict(X_test), file_pi, protocol=4)
 
+    with open(y_pred_train_file, 'wb') as file_pi:
+        pickle.dump(model.predict(X_train), file_pi, protocol=4)
+
 
 
 
@@ -366,7 +371,18 @@ if __name__ == "__main__":
         run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
     else:
         run_id = sys.argv[1]
-    
+
+    if len(sys.argv) > 2 and sys.argv[2] == "smote":
+        # Apply smote to the training set
+        smote = SMOTE()
+        # Reshape the data to fit the SMOTE algorithm
+        original_shape = X_train.shape
+        X_train = X_train.reshape(X_train.shape[0], X_train.shape[1] * X_train.shape[2])
+        X_train, y_train = smote.fit_resample(X_train, y_train)
+        # Reshape the data back to the original shape
+        X_train = X_train.reshape(X_train.shape[0], original_shape[1], original_shape[2])
+        run_id += "_smote"
+
     single_train(cnn_lstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
     #k_train(cnn_lstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
 

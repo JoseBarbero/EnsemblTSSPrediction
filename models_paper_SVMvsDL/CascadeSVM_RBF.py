@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy import random
 import pickle 
+from imblearn.over_sampling import SMOTE
 
 
 '''
@@ -210,6 +211,21 @@ def run(X_train, y_train, X_test, y_test, run_id, start):
             # Time
             print('Elapsed time:', str(timedelta(seconds=time.time() - start)))
 
+def keep_1to1(X_train, y_train):
+    # Reduce negative samples to a 10% of its original size
+    X_train_0 = X_train[y_train == 0]
+    X_train_1 = X_train[y_train == 1]
+    y_train_0 = y_train[y_train == 0]
+    y_train_1 = y_train[y_train == 1]
+
+    X_train_0 = X_train_0[:int(X_train_0.shape[0]*0.1)]
+    y_train_0 = y_train_0[:int(y_train_0.shape[0]*0.1)]
+
+    X_train = np.concatenate((X_train_0, X_train_1), axis=0)
+    y_train = np.concatenate((y_train_0, y_train_1), axis=0)
+
+    return X_train, y_train
+
 # TO RUN WITH INTELEX: python -m sklearnex my_application.py
 # Args: python CascadeSVM_RBF.py run_id train_pc test_pc species
 # E.g: python CascadeSVM_RBF.py cascade_rbf_10pc_1 10 10 human
@@ -247,6 +263,10 @@ if __name__ == "__main__":
     X_train_file.close()
     X_test_file.close()
 
+    # Keep only 10% of negative instances
+    #run_id += "_1to1"
+    #X_train, y_train = keep_1to1(X_train, y_train)
+
     # Get a random 1% subset of X_train and y_train
     subset_train_size = int(sys.argv[2])/100
     subset_test_size = int(sys.argv[3])/100
@@ -268,6 +288,12 @@ if __name__ == "__main__":
 
     print('X_train shape:', X_train.shape)
     print('X_test shape:', X_test.shape)
+
+    if len(sys.argv) > 5 and sys.argv[5] == "smote":
+        # Apply smote to the training set
+        smote = SMOTE()
+        X_train, y_train = smote.fit_resample(X_train, y_train)
+        run_id += "_smote"
 
     run(X_train, y_train, X_test, y_test, run_id, start)
     #grid_search(X_train, y_train, X_test, y_test, run_id)
