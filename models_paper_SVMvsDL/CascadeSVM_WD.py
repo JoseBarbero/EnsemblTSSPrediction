@@ -242,7 +242,20 @@ def grid_search(X_train, y_train, X_test, y_test, run_id):
                 print("%0.3f (+/-%0.03f) for %r"
                       % (mean, std * 2, params))
    
+def keep_1to1(X_train, y_train):
+    # Reduce negative samples to a 10% of its original size
+    X_train_0 = X_train[y_train == 0]
+    X_train_1 = X_train[y_train == 1]
+    y_train_0 = y_train[y_train == 0]
+    y_train_1 = y_train[y_train == 1]
 
+    X_train_0 = X_train_0[:int(X_train_0.shape[0]*0.1)]
+    y_train_0 = y_train_0[:int(y_train_0.shape[0]*0.1)]
+
+    X_train = np.concatenate((X_train_0, X_train_1), axis=0)
+    y_train = np.concatenate((y_train_0, y_train_1), axis=0)
+
+    return X_train, y_train
 
 if __name__ == '__main__':
     # Set run id
@@ -294,6 +307,10 @@ if __name__ == '__main__':
     # Get a random 1% subset of X_train and y_train
     subset_train_size = int(sys.argv[2])/100
     subset_test_size = int(sys.argv[3])/100
+
+    if len(sys.argv) > 5 and sys.argv[5] == "1to1":
+        X_train, y_train = keep_1to1(X_train, y_train)
+        run_id += "_1to1"
 
     #random.seed(42)
     train_size = X_train.shape[0]

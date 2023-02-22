@@ -16,6 +16,21 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.callbacks import LearningRateScheduler
 from imblearn.over_sampling import SMOTE
 
+def keep_1to1(X_train, y_train):
+    # Reduce negative samples to a 10% of its original size
+    X_train_0 = X_train[y_train == 0]
+    X_train_1 = X_train[y_train == 1]
+    y_train_0 = y_train[y_train == 0]
+    y_train_1 = y_train[y_train == 1]
+
+    X_train_0 = X_train_0[:int(X_train_0.shape[0]*0.1)]
+    y_train_0 = y_train_0[:int(y_train_0.shape[0]*0.1)]
+
+    X_train = np.concatenate((X_train_0, X_train_1), axis=0)
+    y_train = np.concatenate((y_train_0, y_train_1), axis=0)
+
+    return X_train, y_train
+
 def cnn():
     model = Sequential()
 
@@ -348,28 +363,31 @@ if __name__ == "__main__":
     # Time
     start = time.time()
 
-    # X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
-    # y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
-    # X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS.pkl', 'rb')
-    # y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS.pkl', 'rb')
-    # X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
-    # y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
-
-    X_train_file = open('../data/TSS/onehot_serialized/mouse_X_train_TSS.pkl', 'rb')
-    y_train_file = open('../data/TSS/onehot_serialized/mouse_y_train_TSS.pkl', 'rb')
-    X_val_file = open('../data/TSS/onehot_serialized/mouse_X_val_TSS.pkl', 'rb')
-    y_val_file = open('../data/TSS/onehot_serialized/mouse_y_val_TSS.pkl', 'rb')
-    X_test_file = open('../data/TSS/onehot_serialized/mouse_X_test_TSS.pkl', 'rb')
-    y_test_file = open('../data/TSS/onehot_serialized/mouse_y_test_TSS.pkl', 'rb')
+    # Read data
+    species = sys.argv[2]
+    if species == "human":
+        X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
+        y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
+        X_val_file = open('../data/TSS/onehot_serialized/X_val_TSS.pkl', 'rb')
+        y_val_file = open('../data/TSS/onehot_serialized/y_val_TSS.pkl', 'rb')
+        X_test_file = open('../data/TSS/onehot_serialized/X_test_TSS.pkl', 'rb')
+        y_test_file = open('../data/TSS/onehot_serialized/y_test_TSS.pkl', 'rb')
+    elif species == "mouse":
+        X_train_file = open('../data/TSS/onehot_serialized/mouse_X_train_TSS.pkl', 'rb')
+        y_train_file = open('../data/TSS/onehot_serialized/mouse_y_train_TSS.pkl', 'rb')
+        X_val_file = open('../data/TSS/onehot_serialized/mouse_X_val_TSS.pkl', 'rb')
+        y_val_file = open('../data/TSS/onehot_serialized/mouse_y_val_TSS.pkl', 'rb')
+        X_test_file = open('../data/TSS/onehot_serialized/mouse_X_test_TSS.pkl', 'rb')
+        y_test_file = open('../data/TSS/onehot_serialized/mouse_y_test_TSS.pkl', 'rb')
+    else:
+        print("Species not recognized")
+        exit()
+    
 
     X_train = pickle.load(X_train_file)
-    #X_train = X_train[::2]
     y_train = pickle.load(y_train_file)
-    #y_train = y_train[::2]
     X_val = pickle.load(X_val_file)
-    #X_val = X_val[::2]
     y_val = pickle.load(y_val_file)
-    #y_val = y_val[::2]
     X_test = pickle.load(X_test_file)
     y_test = pickle.load(y_test_file)
 
@@ -386,7 +404,7 @@ if __name__ == "__main__":
         run_id = sys.argv[1]
         #run_id = "".join(categories)
     
-    if len(sys.argv) > 2 and sys.argv[2] == "smote":
+    if len(sys.argv) > 3 and sys.argv[3] == "smote":
         # Apply smote to the training set
         smote = SMOTE()
         # Reshape the data to fit the SMOTE algorithm
@@ -396,6 +414,11 @@ if __name__ == "__main__":
         # Reshape the data back to the original shape
         X_train = X_train.reshape(X_train.shape[0], original_shape[1], original_shape[2])
         run_id += "_smote"
+    elif len(sys.argv) > 3 and sys.argv[3] == "1to1":
+        # Keep only 10% of negative instances
+        X_train, y_train = keep_1to1(X_train, y_train)
+        run_id += "_1to1"
+        
     
     single_train(cnn(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
     #k_train(cnn(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)

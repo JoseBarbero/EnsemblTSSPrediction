@@ -263,10 +263,6 @@ if __name__ == "__main__":
     X_train_file.close()
     X_test_file.close()
 
-    # Keep only 10% of negative instances
-    #run_id += "_1to1"
-    #X_train, y_train = keep_1to1(X_train, y_train)
-
     # Get a random 1% subset of X_train and y_train
     subset_train_size = int(sys.argv[2])/100
     subset_test_size = int(sys.argv[3])/100
@@ -294,6 +290,9 @@ if __name__ == "__main__":
         smote = SMOTE()
         X_train, y_train = smote.fit_resample(X_train, y_train)
         run_id += "_smote"
+    elif len(sys.argv) > 5 and sys.argv[5] == "1to1":
+        X_train, y_train = keep_1to1(X_train, y_train)
+        run_id += "_1to1"
 
     run(X_train, y_train, X_test, y_test, run_id, start)
     #grid_search(X_train, y_train, X_test, y_test, run_id)
