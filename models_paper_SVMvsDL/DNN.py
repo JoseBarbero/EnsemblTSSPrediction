@@ -11,7 +11,7 @@ from contextlib import redirect_stdout
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, Conv2D, Conv3D, Dropout, MaxPooling1D, MaxPooling2D, Flatten, Dense, LSTM, Bidirectional
+from tensorflow.keras.layers import Conv1D, Conv2D, Conv3D, Dropout, MaxPooling1D, MaxPooling2D, Flatten, Dense, LSTM, Bidirectional, Activation
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.callbacks import LearningRateScheduler
 from imblearn.over_sampling import SMOTE
@@ -31,7 +31,81 @@ def keep_1to1(X_train, y_train):
 
     return X_train, y_train
 
-def cnn_blstm():
+def cnn():
+    model = Sequential()
+
+    model.add(Conv1D(filters=32, kernel_size=5, data_format='channels_last', strides=1, activation='relu', input_shape=(1003, 4)))
+    model.add(MaxPooling1D(4))
+
+    model.add(Conv1D(filters=32, kernel_size=5, strides=1, activation='relu'))
+    model.add(MaxPooling1D(4))
+
+    model.add(Conv1D(filters=32, kernel_size=5, strides=1, activation='relu'))
+    model.add(MaxPooling1D(4))
+
+    model.add(Dense(1024, activation = 'relu'))
+    model.add(Dropout(0.2))
+    model.add(Dense(512, activation = 'relu'))
+    model.add(Dropout(0.2))
+    model.add(Dense(128, activation = 'relu'))
+    model.add(Dropout(0.2))
+
+    model.add(Flatten())
+
+    model.add(Dense(1, activation = 'sigmoid'))
+
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", f1_m, 'AUC'])                                                                         
+
+    return model
+
+def lstm():
+    sequence_input = tf.keras.layers.Input(shape=(1003,4))
+
+    x = LSTM(units=128, return_sequences=True, input_shape=(1003,4))(sequence_input)
+    x = Dense(64)(x)
+    x = Dropout(0.5)(x)
+    x = Activation('relu')(x)
+    x = Flatten()(x)
+    output = Dense(1)(x)
+    output = Activation('sigmoid')(output)
+
+    model = tf.keras.Model(inputs=sequence_input, outputs=output)
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", f1_m, 'AUC'])
+
+    return model
+
+def bilstm():
+    sequence_input = tf.keras.layers.Input(shape=(1003,4))
+
+    x = Bidirectional(tf.keras.layers.LSTM(units=128, return_sequences=True, input_shape=(1003,4)))(sequence_input)
+    x = Dense(64)(x)
+    x = Dropout(0.5)(x)
+    x = Activation('relu')(x)
+    x = Flatten()(x)
+    output = Dense(1)(x)
+    output = Activation('sigmoid')(output)
+
+    model = tf.keras.Model(inputs=sequence_input, outputs=output)
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", f1_m, 'AUC'])
+
+    return model
+
+def cnn_lstm():
+    model = Sequential()
+
+    model.add(Conv1D(filters=64, kernel_size=3, data_format='channels_last', activation='relu', input_shape=(1003, 4)))
+    model.add(MaxPooling1D(3))
+    model.add(Dropout(0.25))
+    model.add(LSTM(64, return_sequences=True, go_backwards=False))
+    model.add(Dropout(0.8))
+    model.add(Flatten())
+    model.add(Dense(1, activation = 'sigmoid'))
+
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='binary_crossentropy', metrics=["accuracy", f1_m, 'AUC'])
+
+    return model
+
+def cnn_bilstm():
     model = Sequential()
 
     model.add(Conv1D(filters=64, kernel_size=3, data_format='channels_last', activation='relu', input_shape=(1003, 4)))
@@ -47,6 +121,7 @@ def cnn_blstm():
     return model
 
 def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_test, global_y_train, global_y_val, global_y_test, run_id):
+
     
     accuracy_train = np.zeros(5)
     binarycrossentropy_train = np.zeros(5)
@@ -64,7 +139,7 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
     auc_test = np.zeros(5)
 
     summary_file = "logs/"+run_id+".log"
-
+    
     # Shuffle X_train and y_train keeping the same order
     shuffled_X_train_idx = np.random.permutation(len(global_X_train))
     global_X_train = global_X_train[shuffled_X_train_idx]
@@ -81,8 +156,10 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
     X_val_splits = np.array_split(global_X_val, n_folds)
     y_val_splits = np.array_split(global_y_val, n_folds)
 
+    
+    # Train model
     for k in range(n_folds):
-
+    
         X_train = X_train_splits[k]
         y_train = y_train_splits[k]
         X_val = X_val_splits[k]
@@ -107,6 +184,7 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
             os.mkdir(logdir)
 
         model = model_definition
+        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy", f1_m, 'AUC'])
         model.summary()
 
         with open(log_file, 'w') as f:
@@ -129,6 +207,12 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
                                     validation_data=(X_val, y_val),
                                     callbacks=[early_stopping_monitor, reduce_lr_loss])
 
+                print('Class 0 y_train: ', np.sum(y_train == 0))
+                print('Class 1 y_train: ', np.sum(y_train == 1))
+
+                print('Class 0 y_test: ', np.sum(y_test == 0))
+                print('Class 1 y_test: ', np.sum(y_test == 1))
+                
                 print("Train results:\n")
                 test_results(X_train, y_train, model)
                 print("Val results:\n")
@@ -159,7 +243,7 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
                 
                 with open(y_pred_file, 'wb') as file_pi:
                     pickle.dump(model.predict(X_test), file_pi, protocol=4)
-
+                
                 # plot_train_history(history.history, plot_file)
         
         binarycrossentropy_train[k], accuracy_train[k], f1_train[k], auc_train[k] = model.evaluate(X_train, y_train, verbose=False)
@@ -169,7 +253,8 @@ def k_train(model_definition, n_folds, global_X_train, global_X_val, global_X_te
         with open(hist_file, 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
 
-        model.save(model_file)
+        model.save(model_file)  
+
 
         with open(summary_file, 'w+') as summary_f:
             summary_f.write('accuracy_train: ')
@@ -256,8 +341,8 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
     log_file = "logs/"+run_id+".log"
     hist_file = "logs/"+run_id+".pkl"
-    plot_file = "logs/"+run_id+".png" 
-    model_file = "logs/"+run_id+".h5"  
+    plot_file = "logs/"+run_id+".png"
+    model_file = "logs/"+run_id+".h5"
     X_train_file = "logs/"+run_id+"_X_train.pkl"
     X_val_file = "logs/"+run_id+"_X_val.pkl"
     X_test_file = "logs/"+run_id+"_X_test.pkl"
@@ -272,8 +357,6 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
         os.mkdir(logdir)
 
     model = model_definition
-    model.build(X_train.shape)
-    model.summary()
 
     with open(log_file, 'w') as f:
         with redirect_stdout(f):
@@ -284,7 +367,7 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
             early_stopping_monitor = EarlyStopping( monitor='val_loss', min_delta=0, patience=10, 
                                                     verbose=1, mode='min', baseline=None,
                                                     restore_best_weights=True)
-            reduce_lr_loss = ReduceLROnPlateau(monitor='val_auc', factor=0.25, patience=3, verbose=1, min_delta=1e-4, mode='max')
+            reduce_lr_loss = ReduceLROnPlateau(monitor='val_auc', factor=0.5, patience=3, verbose=1, min_delta=1e-4, mode='max')
 
             history = model.fit(X_train, y_train,
                                 shuffle=True,
@@ -293,13 +376,6 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
                                 verbose=True,
                                 validation_data=(X_val, y_val),
                                 callbacks=[early_stopping_monitor, reduce_lr_loss])
-
-            print('Class 0 y_train: ', np.sum(y_train == 0))
-            print('Class 1 y_train: ', np.sum(y_train == 1))
-
-            print('Class 0 y_test: ', np.sum(y_test == 0))
-            print('Class 1 y_test: ', np.sum(y_test == 1))
-            
             print("Train results:\n")
             test_results(X_train, y_train, model)
             print("Val results:\n")
@@ -309,9 +385,8 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
 
             # Time formatted in days, hours, minutes and seconds
             print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")
-
             
-    model.save(model_file)
+
     with open(hist_file, 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
     
@@ -339,16 +414,45 @@ def single_train(model_definition, X_train, X_val, X_test, y_train, y_val, y_tes
     with open(y_pred_train_file, 'wb') as file_pi:
         pickle.dump(model.predict(X_train), file_pi, protocol=4)
 
+    model.save(model_file)
+    #plot_train_history(history.history, plot_file)
 
-
-
+# Running arguments examples:
+#   python DNN.py cnn_1 cnn human 1to1
+#   python DNN.py lstm_1 lstm human 1to1
+#   python DNN.py bilstm_1 bilstm human 1to1
+#   python DNN.py lstm_cnn_1 lstm_cnn human 1to1
+#   python DNN.py bilstm_cnn_1 bilstm_cnn human 1to1
 if __name__ == "__main__":
     #seed = 42
     #np.random.seed(seed)
     #tf.random.set_seed(42)
 
+    # Time
+    start = time.time()
+
+    if len(sys.argv) < 2:
+        run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
+    else:
+        run_id = sys.argv[1]
+        #run_id = "".join(categories)
+
+    if sys.argv[2] == "cnn":
+        model = cnn()
+    elif sys.argv[2] == "lstm":
+        model = lstm()
+    elif sys.argv[2] == "cnn_lstm":
+        model = cnn_lstm()
+    elif sys.argv[2] == "bilstm":
+        model = bilstm()
+    elif sys.argv[2] == "cnn_bilstm":
+        model = cnn_bilstm()
+    else:
+        print("Invalid model. Please choose one of the following: cnn, lstm, cnn_lstm, bilstm, cnn_bilstm")
+        exit()
+    
     # Read data
-    species = sys.argv[2]
+    species = sys.argv[3]
     if species == "human":
         X_train_file = open('../data/TSS/onehot_serialized/X_train_TSS.pkl', 'rb')
         y_train_file = open('../data/TSS/onehot_serialized/y_train_TSS.pkl', 'rb')
@@ -366,15 +470,12 @@ if __name__ == "__main__":
     else:
         print("Species not recognized")
         exit()
+    
 
     X_train = pickle.load(X_train_file)
-    #X_train = X_train[::2]
     y_train = pickle.load(y_train_file)
-    #y_train = y_train[::2]
     X_val = pickle.load(X_val_file)
-    #X_val = X_val[::2]
     y_val = pickle.load(y_val_file)
-    #y_val = y_val[::2]
     X_test = pickle.load(X_test_file)
     y_test = pickle.load(y_test_file)
 
@@ -385,12 +486,8 @@ if __name__ == "__main__":
     X_test_file.close()
     y_test_file.close()
     
-    if len(sys.argv) < 2:
-        run_id = str(datetime.now()).replace(" ", "_").replace("-", "_").replace(":", "_").split(".")[0]
-    else:
-        run_id = sys.argv[1]
     
-    if len(sys.argv) > 3 and sys.argv[3] == "smote":
+    if len(sys.argv) > 4 and sys.argv[4] == "smote":
         # Apply smote to the training set
         smote = SMOTE()
         # Reshape the data to fit the SMOTE algorithm
@@ -400,10 +497,14 @@ if __name__ == "__main__":
         # Reshape the data back to the original shape
         X_train = X_train.reshape(X_train.shape[0], original_shape[1], original_shape[2])
         run_id += "_smote"
-    elif len(sys.argv) > 3 and sys.argv[3] == "1to1":
+    elif len(sys.argv) > 4 and sys.argv[4] == "1to1":
         # Keep only 10% of negative instances
         X_train, y_train = keep_1to1(X_train, y_train)
         run_id += "_1to1"
+        
+    
+    single_train(model, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    #k_train(model, 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
 
-    single_train(cnn_blstm(), X_train, X_val, X_test, y_train, y_val, y_test, run_id)
-    #k_train(cnn_blstm(), 5, X_train, X_val, X_test, y_train, y_val, y_test, run_id)
+    # Time formatted in days, hours, minutes and seconds
+    print(f"Time elapsed: {time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - start))}")
