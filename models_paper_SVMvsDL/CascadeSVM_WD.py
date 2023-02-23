@@ -23,13 +23,14 @@ Original code from: https://github.com/fhebert/CascadeSVC
 
 class CascadeSVM_WD():
     def __init__(self, fold_size=10000, verbose=True, C=1, kernel="precomputed", degree=3,
-                 gamma="scale", coef0=0.0, probability=True):
+                 gamma="scale", coef0=0.0, d=10, probability=True):
         self.fold_size = fold_size
         self.verbose = verbose
         self.C = C
         self.kernel = kernel
         self.degree = degree
         self.gamma = gamma
+        self.d = d
         self.coef0 = coef0
         self.probability = probability
         base_svc = SVC(C=self.C, kernel=self.kernel, degree=self.degree,
@@ -39,7 +40,7 @@ class CascadeSVM_WD():
         self.X_trained = None
 
     def __get_sv__(self,id,X,y):
-        X_gram_matrix = parallel_wdkernel_gram_matrix(X, X)
+        X_gram_matrix = parallel_wdkernel_gram_matrix(X, X, d=self.d)
         self.base_svc.fit(X_gram_matrix,y)
         ind_sv = self.base_svc.support_
         X = X[ind_sv, :]
@@ -111,7 +112,7 @@ class CascadeSVM_WD():
         return self.base_svc.decision_function(X)
     
     def predict(self,X):
-        X_gram_matrix = parallel_wdkernel_gram_matrix(X, self.X_trained)
+        X_gram_matrix = parallel_wdkernel_gram_matrix(X, self.X_trained, d=self.d)
         pred = self.classes_[self.base_svc.predict(X_gram_matrix)]
         return pred
     
@@ -120,7 +121,7 @@ class CascadeSVM_WD():
         return pred
     
     def predict_proba(self,X):
-        X_gram_matrix = parallel_wdkernel_gram_matrix(X, self.X_trained)
+        X_gram_matrix = parallel_wdkernel_gram_matrix(X, self.X_trained, d=self.d)
         prob = self.base_svc.predict_proba(X_gram_matrix)
         return prob
     
@@ -143,16 +144,16 @@ class CascadeSVM_WD():
                 setattr(self.base_svc, par, val)
         return self
 
-def run(X_train, y_train, X_test, y_test, run_id, start):
+def run(X_train, y_train, X_test, y_test, run_id, start, wd_d=10):
     # Model
     fold_size=X_train.shape[0]/100
     print("Fold size: "+str(fold_size))
-    clf = CascadeSVM_WD(fold_size=fold_size, C=0.1, kernel="precomputed", probability=True)
+    clf = CascadeSVM_WD(fold_size=fold_size, C=0.1, kernel="precomputed", probability=True, d=wd_d)
     train_idx = clf.fit(X_train, y_train)
 
     # Prediction
-    X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[train_idx])
-    X_train_gram = parallel_wdkernel_gram_matrix(X_train[train_idx], X_train[train_idx])
+    X_test_gram = parallel_wdkernel_gram_matrix(X_test, X_train[train_idx], d=wd_d)
+    X_train_gram = parallel_wdkernel_gram_matrix(X_train[train_idx], X_train[train_idx], d=wd_d)
     y_train = y_train[train_idx]
     y_pred_test = clf.predict_from_gram_matrix(X_test_gram)
     y_pred_train = clf.predict_from_gram_matrix(X_train_gram)
@@ -308,7 +309,12 @@ if __name__ == '__main__':
     subset_train_size = int(sys.argv[2])/100
     subset_test_size = int(sys.argv[3])/100
 
-    if len(sys.argv) > 5 and sys.argv[5] == "1to1":
+    if len(sys.argv) > 5:
+        wd_d = int(sys.argv[5])
+    else:
+        wd_d = None
+
+    if len(sys.argv) > 6 and sys.argv[6] == "1to1":
         X_train, y_train = keep_1to1(X_train, y_train)
         run_id += "_1to1"
 
@@ -326,5 +332,5 @@ if __name__ == '__main__':
     print('X_train shape:', X_train.shape)
     print('X_test shape:', X_test.shape)
 
-    run(X_train, y_train, X_test, y_test, run_id, start)
+    run(X_train, y_train, X_test, y_test, run_id, start, wd_d)
     #grid_search(X_train, y_train, X_test, y_test, run_id)
