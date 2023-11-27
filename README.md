@@ -11,7 +11,7 @@ Mouse Dataset: https://doi.org/10.5281/zenodo.7679000
 The steps to recreate the dataset can be found in the [curate_data](https://github.com/JoseBarbero/EnsemblTSSPrediction/tree/main/curate_data) folder.
 
 ## Citation
-Barbero-Aparicio JA, Olivares-Gil A, Díez-Pastor JF, García-Osorio C. 2023. Deep learning and support vector machines for transcription start site identification. PeerJ Computer Science 9:e1340 https://doi.org/10.7717/peerj-cs.1340
+Barbero-Aparicio JA, Olivares-Gil A, Díez-Pastor JF, García-Osorio C. 2023. Deep learning and support vector machines for transcription start site identification. _PeerJ Computer Science 9_:e1340 https://doi.org/10.7717/peerj-cs.1340
 
 ### Bibtex
 ```
